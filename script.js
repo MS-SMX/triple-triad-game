@@ -3,8 +3,11 @@ const board = document.getElementById("board");
 const hand1 = document.getElementById("hand1");
 const hand2 = document.getElementById("hand2");
 const status = document.getElementById("status");
+const score1 = document.getElementById("score1");
+const score2 = document.getElementById("score2");
 
 let currentPlayer = 1;
+let mosseTotali = 0;
 
 const carteGiocatore1 = [
   { nome: "Ifrit", valori: { n: 5, e: 7, s: 2, o: 1 }, colore: "blu" },
@@ -71,11 +74,19 @@ function creaGriglia() {
       cell.appendChild(carta);
 
       aggiornaConquiste(cell, datiCarta);
+      aggiornaPunteggi();
 
       if (fromPlayer === 1) {
         hand1.removeChild(hand1.children[cardIndex]);
       } else {
         hand2.removeChild(hand2.children[cardIndex]);
+      }
+
+      mosseTotali++;
+      if (mosseTotali >= 9) {
+        status.textContent = "Partita terminata! " + determinaVincitore();
+        inviaStatistiche();
+        return;
       }
 
       currentPlayer = currentPlayer === 1 ? 2 : 1;
@@ -114,10 +125,46 @@ function aggiornaConquiste(cell, carta) {
   }
 }
 
+function aggiornaPunteggi() {
+  let p1 = 0, p2 = 0;
+  const cards = document.querySelectorAll(".board .card");
+  cards.forEach(c => {
+    const colore = c.classList.contains("blu") ? 1 : 2;
+    colore === 1 ? p1++ : p2++;
+  });
+  score1.textContent = p1;
+  score2.textContent = p2;
+}
+
+function determinaVincitore() {
+  const s1 = parseInt(score1.textContent);
+  const s2 = parseInt(score2.textContent);
+  return s1 > s2 ? "Vince Giocatore 1!" : s2 > s1 ? "Vince Giocatore 2!" : "Pareggio!";
+}
+
+function inviaStatistiche() {
+  const vincitore = determinaVincitore();
+  const url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec";
+  const dati = {
+    giocatore: vincitore,
+    punteggio: `${score1.textContent}-${score2.textContent}`
+  };
+
+  fetch(url, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dati)
+  }).then(() => console.log("Statistiche inviate."));
+}
+
 function avviaGioco() {
   carteGiocatore1.forEach((c, i) => hand1.appendChild(creaCarta(c, i, 1)));
   carteGiocatore2.forEach((c, i) => hand2.appendChild(creaCarta(c, i, 2)));
   creaGriglia();
+  aggiornaPunteggi();
 }
 
 avviaGioco();
