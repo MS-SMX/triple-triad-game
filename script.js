@@ -76,11 +76,9 @@ function creaGriglia() {
       aggiornaConquiste(cell, datiCarta);
       aggiornaPunteggi();
 
-      if (fromPlayer === 1) {
-        hand1.removeChild(hand1.children[cardIndex]);
-      } else {
-        hand2.removeChild(hand2.children[cardIndex]);
-      }
+     const tutteCarte = fromPlayer === 1 ? hand1.querySelectorAll('.card') : hand2.querySelectorAll('.card');
+hand1.removeChild(tutteCarte[cardIndex]);
+
 
       mosseTotali++;
       if (mosseTotali >= 9) {
