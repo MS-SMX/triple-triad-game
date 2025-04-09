@@ -12,6 +12,12 @@ body {
 h1 {
   margin-bottom: 1rem;
 }
+.scoreboard {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
 .board {
   display: grid;
   grid-template-columns: repeat(3, 100px);
@@ -40,6 +46,7 @@ h1 {
   justify-content: center;
   align-items: center;
   cursor: grab;
+  transition: transform 0.2s ease;
 }
 .card.blu {
   border-color: #3399ff;
