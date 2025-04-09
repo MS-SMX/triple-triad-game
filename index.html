@@ -73,12 +73,9 @@
     for (let i = 0; i < 9; i++) {
       board.appendChild(createCell(i));
     }
-  </script>
-</body>
-</html>
 
-function inviaStatistiche(giocatore, punteggio) {
-  var url = "https://script.google.com/macros/s/AKfycbwZvn65sS12eF8wViSmywDqfQNEiYZu1xiCKNCMtN59hWrLhbdA9Yy8HIb2-MhhWyC22w/exec"; // Sostituisci con l'URL copiato
+    function inviaStatistiche(giocatore, punteggio) {
+  var url = "https://script.google.com/macros/s/AKfycbw9zNvUeGrXmCzKtaNr_e4BA2HojtgaR39YGLPm230DUiLMhp18k2BlVm3IwkSub9TKlg/exec"; // Sostituisci con l'URL copiato
   var dati = {
     giocatore: giocatore,
     punteggio: punteggio
@@ -95,3 +92,8 @@ function inviaStatistiche(giocatore, punteggio) {
   .then(response => console.log("Dati inviati con successo"))
   .catch(error => console.error("Errore nell'invio dei dati", error));
 }
+
+  </script>
+</body>
+</html>
+
