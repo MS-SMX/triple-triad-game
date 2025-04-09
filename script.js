@@ -76,19 +76,21 @@ function creaGriglia() {
       aggiornaConquiste(cell, datiCarta);
       aggiornaPunteggi();
 
-     const tutteCarte = fromPlayer === 1 ? hand1.querySelectorAll('.card') : hand2.querySelectorAll('.card');
-hand1.removeChild(tutteCarte[cardIndex]);
-
+      const tutteCarte = fromPlayer === 1 ? hand1.querySelectorAll('.card') : hand2.querySelectorAll('.card');
+      if (fromPlayer === 1) {
+        hand1.removeChild(tutteCarte[cardIndex]);
+      } else {
+        hand2.removeChild(tutteCarte[cardIndex]);
+      }
 
       mosseTotali++;
       if (mosseTotali >= 9) {
-aggiornaPunteggi();
-setTimeout(() => {
-  const messaggio = \"Partita terminata! \" + determinaVincitore();
-  status.textContent = messaggio;
-  inviaStatistiche();
-}, 100);
-        inviaStatistiche();
+        aggiornaPunteggi();
+        setTimeout(() => {
+          const messaggio = "Partita terminata! " + determinaVincitore();
+          status.textContent = messaggio;
+          inviaStatistiche();
+        }, 100);
         return;
       }
 
@@ -142,12 +144,14 @@ function aggiornaPunteggi() {
 function determinaVincitore() {
   const s1 = parseInt(score1.textContent);
   const s2 = parseInt(score2.textContent);
-  return s1 > s2 ? "Vince Giocatore 1!" : s2 > s1 ? "Vince Giocatore 2!" : "Pareggio!";
+  if (s1 > s2) return "Vince Giocatore 1!";
+  if (s2 > s1) return "Vince Giocatore 2!";
+  return "Pareggio!";
 }
 
 function inviaStatistiche() {
   const vincitore = determinaVincitore();
-  const url = "https://script.google.com/macros/s/AKfycbyUJJZHmtdJ54q1-4GVRMazfzeZZcx9ylt8ZSCQtQD369qLXLxycos8ON9IegPvQ1OqZw/exec";
+  const url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec"; // <- sostituisci con il tuo URL
   const dati = {
     giocatore: vincitore,
     punteggio: `${score1.textContent}-${score2.textContent}`
