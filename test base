@@ -78,7 +78,7 @@
 </html>
 
 function inviaStatistiche(giocatore, punteggio) {
-  var url = "URL_DEL_TUO_WEB_APP"; // Sostituisci con l'URL copiato
+  var url = "https://script.google.com/macros/s/AKfycbwZvn65sS12eF8wViSmywDqfQNEiYZu1xiCKNCMtN59hWrLhbdA9Yy8HIb2-MhhWyC22w/exec"; // Sostituisci con l'URL copiato
   var dati = {
     giocatore: giocatore,
     punteggio: punteggio
