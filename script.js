@@ -151,7 +151,7 @@ function determinaVincitore() {
 
 function inviaStatistiche() {
   const vincitore = determinaVincitore();
-  const url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec"; // <- sostituisci con il tuo URL
+  const url = "https://script.google.com/macros/s/AKfycbyUJJZHmtdJ54q1-4GVRMazfzeZZcx9ylt8ZSCQtQD369qLXLxycos8ON9IegPvQ1OqZw/exec"; // <- sostituisci con il tuo URL
   const dati = {
     giocatore: vincitore,
     punteggio: `${score1.textContent}-${score2.textContent}`
