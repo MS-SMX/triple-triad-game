@@ -82,7 +82,12 @@ hand1.removeChild(tutteCarte[cardIndex]);
 
       mosseTotali++;
       if (mosseTotali >= 9) {
-        status.textContent = "Partita terminata! " + determinaVincitore();
+aggiornaPunteggi();
+setTimeout(() => {
+  const messaggio = \"Partita terminata! \" + determinaVincitore();
+  status.textContent = messaggio;
+  inviaStatistiche();
+}, 100);
         inviaStatistiche();
         return;
       }
