@@ -1,22 +1,26 @@
 <!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Triple Triad</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triple Triad - FFVIII</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Triple Triad</h1>
-  <div class="scoreboard">
-    <div>Giocatore 1: <span id="score1">0</span></div>
-    <div>Giocatore 2: <span id="score2">0</span></div>
+  <div id="game">
+    <div id="hand1"></div>
+    <div id="board"></div>
+    <div id="hand2"></div>
   </div>
-  <div class="hand" id="hand1"></div>
-  <div class="board" id="board"></div>
-  <div class="hand" id="hand2"></div>
-  <p id="status">Turno: Giocatore 1</p>
+  <div id="status">Caricamento...</div>
+  <div id="punteggi">
+    <span>Giocatore 1: <span id="score1">0</span></span> | 
+    <span>Giocatore 2: <span id="score2">0</span></span>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
