@@ -1,110 +1,79 @@
-const board = document.getElementById('board');
-const hand1 = document.getElementById('hand1');
-const hand2 = document.getElementById('hand2');
-const score1 = document.getElementById('score1');
-const score2 = document.getElementById('score2');
-const resetButton = document.getElementById('resetButton');
-
-let currentPlayer = 1;
-let moves = 0;
-let player1Score = 0;
-let player2Score = 0;
-
-const cards = [
-    { name: "Ifrit", image: "ifrit.png", stats: [2, 4, 3, 1] }, // Esempio di carta con stats
-    { name: "Shiva", image: "shiva.png", stats: [3, 1, 2, 4] },
-    { name: "Quezacotl", image: "quezacotl.png", stats: [4, 2, 3, 1] },
-    { name: "Bahamut", image: "bahamut.png", stats: [5, 1, 4, 3] },
-    { name: "Titan", image: "titan.png", stats: [2, 5, 4, 3] },
-    { name: "Leviathan", image: "leviathan.png", stats: [3, 4, 2, 5] },
-    { name: "Diablos", image: "diablos.png", stats: [4, 3, 5, 2] },
-    { name: "Siren", image: "siren.png", stats: [3, 3, 4, 4] }
-];
-
-function shuffleDeck(deck) {
-    return deck.sort(() => Math.random() - 0.5);
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #2b2b2b;
+    color: white;
 }
 
-function createCard(card) {
-    const cardElement = document.createElement('div');
-    cardElement.className = 'card';
-    cardElement.setAttribute('draggable', true);
-    cardElement.setAttribute('data-card', JSON.stringify(card));
-    
-    const img = document.createElement('img');
-    img.src = `img/${card.image}`;
-    img.alt = card.name;
-    
-    cardElement.appendChild(img);
-
-    cardElement.addEventListener('dragstart', dragStart);
-    cardElement.addEventListener('dragend', dragEnd);
-
-    return cardElement;
+h1 {
+    color: #ffcc00;
 }
 
-function dragStart(event) {
-    event.dataTransfer.setData('text/plain', event.target.dataset.card);
+.scores {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
 }
 
-function dragEnd(event) {
-    // Logica per rimuovere la carta dalla mano dopo che è stata giocata
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    grid-template-rows: repeat(3, 120px);
+    gap: 8px;
+    margin: 20px auto;
+    width: 380px;
+    height: 380px;
+    background-color: #333;
 }
 
-function dragOver(event) {
-    event.preventDefault();
+.cell {
+    width: 100%;
+    height: 100%;
+    background-color: #444;
+    border: 2px solid #666;
+    border-radius: 8px;
+    position: relative;
+    transition: background-color 0.3s ease;
 }
 
-function drop(event) {
-    event.preventDefault();
-    const cardData = JSON.parse(event.dataTransfer.getData('text/plain'));
-    const cell = event.target;
-
-    // Logica per posizionare la carta sulla cella
-    console.log('Carta giocata:', cardData);
-    cell.style.backgroundColor = "#444"; // Cambia colore per indicare che la carta è stata posata
-    
-    moves++;
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
-    updateStatus();
+.card {
+    width: 100px;
+    height: 100px;
+    background: #111;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s ease;
 }
 
-function updateStatus() {
-    score1.textContent = `Giocatore 1: ${player1Score}`;
-    score2.textContent = `Giocatore 2: ${player2Score}`;
+.card img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
 }
 
-function init() {
-    board.innerHTML = '';
-    hand1.innerHTML = '';
-    hand2.innerHTML = '';
-    moves = 0;
-    currentPlayer = 1;
-    player1Score = 0;
-    player2Score = 0;
-    score1.textContent = 0;
-    score2.textContent = 0;
-
-    // Crea il tabellone
-    for (let i = 0; i < 9; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.addEventListener('dragover', dragOver);
-        cell.addEventListener('drop', drop);
-        board.appendChild(cell);
-    }
-
-    const shuffledDeck = shuffleDeck(cards);
-    const player1Hand = shuffledDeck.slice(0, 5);
-    const player2Hand = shuffledDeck.slice(5, 10);
-
-    player1Hand.forEach(card => hand1.appendChild(createCard(card)));
-    player2Hand.forEach(card => hand2.appendChild(createCard(card)));
-
-    updateStatus();
+.card:hover {
+    transform: scale(1.05);
+    z-index: 5;
 }
 
-resetButton.addEventListener('click', init);
+.hand {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
 
-// Avvia il gioco all'inizio
-init();
+button {
+    padding: 10px 20px;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ffaa00;
+}
