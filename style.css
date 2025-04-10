@@ -66,16 +66,18 @@ button:hover {
 }
 
 .card {
-  width: 100px;
-  height: 100px;
-  background-color: transparent;
+  width: 120px;
+  height: 120px;
   position: relative;
-  border: 2px solid gold;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s, box-shadow 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
+
 
 .card:hover {
   transform: scale(1.05);
@@ -85,7 +87,6 @@ button:hover {
 .card img {
   width: 90%;
   height: 90%;
-  margin: 5%;
   object-fit: contain;
   z-index: 1;
   position: relative;
@@ -108,6 +109,20 @@ button:hover {
   box-shadow: 0 0 10px red;
   border-color: red;
 }
+
+.value {
+  position: absolute;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+  text-shadow: 0 0 3px black;
+  z-index: 2;
+}
+
+.top { top: 4px; left: 50%; transform: translateX(-50%); }
+.right { top: 50%; right: 4px; transform: translateY(-50%); }
+.bottom { bottom: 4px; left: 50%; transform: translateX(-50%); }
+.left { top: 50%; left: 4px; transform: translateY(-50%); }
 
 .occupied {
   pointer-events: none;
