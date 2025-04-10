@@ -1,94 +1,110 @@
-// script.js - Triple Triad FFVIII Style
-
 const board = document.getElementById('board');
 const hand1 = document.getElementById('hand1');
 const hand2 = document.getElementById('hand2');
-const status = document.getElementById('status');
 const score1 = document.getElementById('score1');
 const score2 = document.getElementById('score2');
-const bgMusic = document.getElementById('bg-music');
+const resetButton = document.getElementById('resetButton');
 
 let currentPlayer = 1;
 let moves = 0;
 let player1Score = 0;
 let player2Score = 0;
 
-const allCards = [
-  { name: 'Ifrit', up: 5, down: 2, left: 3, right: 6, img: 'img/ifrit.png' },
-  { name: 'Shiva', up: 7, down: 3, left: 1, right: 4, img: 'img/shiva.png' },
-  { name: 'Quezacotl', up: 6, down: 4, left: 2, right: 5, img: 'img/quezacotl.png' },
-  { name: 'Siren', up: 3, down: 6, left: 4, right: 2, img: 'img/siren.png' },
-  { name: 'Brothers', up: 4, down: 5, left: 6, right: 1, img: 'img/brothers.png' },
-  { name: 'Diablos', up: 4, down: 5, left: 3, right: 6, img: 'img/diablos.png' },
-  { name: 'Carbuncle', up: 2, down: 7, left: 5, right: 1, img: 'img/carbuncle.png' },
-  { name: 'Leviathan', up: 3, down: 6, left: 1, right: 4, img: 'img/leviathan.png' },
-  { name: 'Bahamut', up: 6, down: 2, left: 4, right: 7, img: 'img/bahamut.png' },
-  { name: 'Doomtrain', up: 5, down: 1, left: 7, right: 2, img: 'img/doomtrain.png' }
+const cards = [
+    { name: "Ifrit", image: "ifrit.png", stats: [2, 4, 3, 1] },
+    { name: "Shiva", image: "shiva.png", stats: [3, 1, 2, 4] },
+    { name: "Quezacotl", image: "quezacotl.png", stats: [4, 2, 3, 1] },
+    { name: "Bahamut", image: "bahamut.png", stats: [5, 1, 4, 3] },
+    { name: "Titan", image: "titan.png", stats: [2, 5, 4, 3] },
+    { name: "Leviathan", image: "leviathan.png", stats: [3, 4, 2, 5] },
+    { name: "Diablos", image: "diablos.png", stats: [4, 3, 5, 2] },
+    { name: "Siren", image: "siren.png", stats: [3, 3, 4, 4] }
 ];
 
 function shuffleDeck(deck) {
-  const copy = [...deck];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
+    return deck.sort(() => Math.random() - 0.5);
 }
 
-function createCard(card, player) {
-  const div = document.createElement('div');
-  div.className = `card ${player === 1 ? 'blu' : 'rosso'}`;
-  div.draggable = true;
-  div.dataset.player = player;
-  div.dataset.up = card.up;
-  div.dataset.down = card.down;
-  div.dataset.left = card.left;
-  div.dataset.right = card.right;
-  div.dataset.name = card.name;
-  div.innerHTML = `
-    <div class="card-frame">
-      <div class="card-top">${card.up}</div>
-      <div class="card-middle">
-        <div class="card-left">${card.left}</div>
-        <img class="card-img" src="${card.img}" alt="${card.name}" />
-        <div class="card-right">${card.right}</div>
-      </div>
-      <div class="card-bottom">${card.down}</div>
-    </div>`;
-  div.addEventListener('dragstart', dragStart);
-  return div;
+function createCard(card) {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'card';
+    cardElement.setAttribute('draggable', true);
+    cardElement.setAttribute('data-card', JSON.stringify(card));
+    
+    const img = document.createElement('img');
+    img.src = `img/${card.image}`;
+    img.alt = card.name;
+    
+    cardElement.appendChild(img);
+
+    cardElement.addEventListener('dragstart', dragStart);
+    cardElement.addEventListener('dragend', dragEnd);
+
+    return cardElement;
+}
+
+function dragStart(event) {
+    event.dataTransfer.setData('text/plain', event.target.dataset.card);
+}
+
+function dragEnd(event) {
+    // Logica per rimuovere la carta dalla mano dopo che è stata giocata
+}
+
+function dragOver(event) {
+    event.preventDefault();
+}
+
+function drop(event) {
+    event.preventDefault();
+    const cardData = JSON.parse(event.dataTransfer.getData('text/plain'));
+    const cell = event.target;
+
+    // Logica per posizionare la carta sulla cella
+    console.log('Carta giocata:', cardData);
+    cell.style.backgroundColor = "#444"; // Cambia colore per indicare che la carta è stata posata
+    
+    moves++;
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    updateStatus();
+}
+
+function updateStatus() {
+    score1.textContent = `Giocatore 1: ${player1Score}`;
+    score2.textContent = `Giocatore 2: ${player2Score}`;
 }
 
 function init() {
-  board.innerHTML = '';
-  hand1.innerHTML = '';
-  hand2.innerHTML = '';
-  moves = 0;
-  currentPlayer = 1;
-  player1Score = 0;
-  player2Score = 0;
-  score1.textContent = 0;
-  score2.textContent = 0;
+    board.innerHTML = '';
+    hand1.innerHTML = '';
+    hand2.innerHTML = '';
+    moves = 0;
+    currentPlayer = 1;
+    player1Score = 0;
+    player2Score = 0;
+    score1.textContent = 0;
+    score2.textContent = 0;
 
-  for (let i = 0; i < 9; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.addEventListener('dragover', dragOver);
-    cell.addEventListener('drop', drop);
-    board.appendChild(cell);
-  }
+    // Crea il tabellone
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.addEventListener('dragover', dragOver);
+        cell.addEventListener('drop', drop);
+        board.appendChild(cell);
+    }
 
-  const deck = shuffleDeck(allCards);
-  const p1Hand = deck.slice(0, 5);
-  const p2Hand = deck.slice(5, 10);
+    const shuffledDeck = shuffleDeck(cards);
+    const player1Hand = shuffledDeck.slice(0, 5);
+    const player2Hand = shuffledDeck.slice(5, 10);
 
-  p1Hand.forEach(card => hand1.appendChild(createCard(card, 1)));
-  p2Hand.forEach(card => hand2.appendChild(createCard(card, 2)));
+    player1Hand.forEach(card => hand1.appendChild(createCard(card)));
+    player2Hand.forEach(card => hand2.appendChild(createCard(card)));
 
-  updateStatus();
-  bgMusic.play();
+    updateStatus();
 }
 
-// Event handlers and game logic functions
+resetButton.addEventListener('click', init);
 
+// Avvia il gioco all'inizio
 init();
