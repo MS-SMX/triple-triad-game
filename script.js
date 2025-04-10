@@ -21,10 +21,12 @@ const cards = [
     { name: "Siren", image: "siren.png", stats: [3, 3, 4, 4] }
 ];
 
+// Funzione per mescolare il mazzo di carte
 function shuffleDeck(deck) {
     return deck.sort(() => Math.random() - 0.5);
 }
 
+// Creazione delle carte
 function createCard(card) {
     const cardElement = document.createElement('div');
     cardElement.className = 'card';
@@ -43,37 +45,43 @@ function createCard(card) {
     return cardElement;
 }
 
+// Quando inizia il drag
 function dragStart(event) {
     event.dataTransfer.setData('text/plain', event.target.dataset.card);
 }
 
+// Quando termina il drag
 function dragEnd(event) {
-    // Logica per rimuovere la carta dalla mano dopo che è stata giocata
+    // Qui possiamo mettere un controllo se la carta è stata effettivamente giocata, per esempio, rimuovendo la carta dalla mano
 }
 
+// Prevenire l'azione di default quando si trascina sopra la cella
 function dragOver(event) {
     event.preventDefault();
 }
 
+// Quando la carta viene rilasciata sulla cella
 function drop(event) {
     event.preventDefault();
     const cardData = JSON.parse(event.dataTransfer.getData('text/plain'));
     const cell = event.target;
 
-    // Logica per posizionare la carta sulla cella
-    console.log('Carta giocata:', cardData);
-    cell.style.backgroundColor = "#444"; // Cambia colore per indicare che la carta è stata posata
-    
+    // Impostiamo la cella come occupata dalla carta
+    cell.style.backgroundColor = "#444"; // Cambiamo colore della cella per segnalarla come occupata
+    cell.appendChild(createCard(cardData));
+
     moves++;
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    currentPlayer = currentPlayer === 1 ? 2 : 1; // Alterniamo il turno tra i giocatori
     updateStatus();
 }
 
+// Aggiorniamo lo stato del punteggio
 function updateStatus() {
     score1.textContent = `Giocatore 1: ${player1Score}`;
     score2.textContent = `Giocatore 2: ${player2Score}`;
 }
 
+// Inizializzazione del gioco
 function init() {
     board.innerHTML = '';
     hand1.innerHTML = '';
@@ -85,7 +93,7 @@ function init() {
     score1.textContent = 0;
     score2.textContent = 0;
 
-    // Crea il tabellone
+    // Creiamo il tabellone
     for (let i = 0; i < 9; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -98,12 +106,15 @@ function init() {
     const player1Hand = shuffledDeck.slice(0, 5);
     const player2Hand = shuffledDeck.slice(5, 10);
 
+    // Creiamo le carte per il Giocatore 1
     player1Hand.forEach(card => hand1.appendChild(createCard(card)));
+    // Creiamo le carte per il Giocatore 2
     player2Hand.forEach(card => hand2.appendChild(createCard(card)));
 
     updateStatus();
 }
 
+// Ricominciare la partita
 resetButton.addEventListener('click', init);
 
 // Avvia il gioco all'inizio
