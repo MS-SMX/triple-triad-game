@@ -70,18 +70,22 @@ function drop(event) {
     const cardData = event.dataTransfer.getData('text/plain');
     
     if (cardData) {  // Se ci sono dati validi
-        const card = JSON.parse(cardData);  // Parso i dati JSON per ottenere la carta
+        try {
+            const card = JSON.parse(cardData);  // Parso i dati JSON per ottenere la carta
+            const cell = event.target;
 
-        const cell = event.target;
-        if (!cell.hasChildNodes()) { // Se la cella non è già occupata
-            // Impostiamo la cella come occupata dalla carta
-            cell.style.backgroundColor = "#444"; // Cambiamo colore della cella per segnalarla come occupata
-            const cardElement = createCard(card);
-            cell.appendChild(cardElement); // Aggiungiamo la carta alla cella
+            if (!cell.hasChildNodes()) { // Se la cella non è già occupata
+                // Impostiamo la cella come occupata dalla carta
+                cell.style.backgroundColor = "#444"; // Cambiamo colore della cella per segnalarla come occupata
+                const cardElement = createCard(card);
+                cell.appendChild(cardElement); // Aggiungiamo la carta alla cella
 
-            moves++;
-            currentPlayer = currentPlayer === 1 ? 2 : 1; // Alterniamo il turno tra i giocatori
-            updateStatus();
+                moves++;
+                currentPlayer = currentPlayer === 1 ? 2 : 1; // Alterniamo il turno tra i giocatori
+                updateStatus();
+            }
+        } catch (error) {
+            console.error("Errore durante il parsing della carta:", error);
         }
     } else {
         console.error("Nessun dato valido per la carta.");
