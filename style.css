@@ -1,79 +1,102 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #2b2b2b;
-    color: white;
+  font-family: 'Trebuchet MS', sans-serif;
+  background: #0c0c0c url('bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
 }
 
 h1 {
-    color: #ffcc00;
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: gold;
+  text-shadow: 2px 2px 4px #000;
 }
 
-.scores {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
-
-.board {
-    display: grid;
-    grid-template-columns: repeat(3, 120px);
-    grid-template-rows: repeat(3, 120px);
-    gap: 8px;
-    margin: 20px auto;
-    width: 380px;
-    height: 380px;
-    background-color: #333;
-}
-
-.cell {
-    width: 100%;
-    height: 100%;
-    background-color: #444;
-    border: 2px solid #666;
-    border-radius: 8px;
-    position: relative;
-    transition: background-color 0.3s ease;
-}
-
-.card {
-    width: 100px;
-    height: 100px;
-    background: #111;
-    border-radius: 8px;
-    position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-    cursor: grab;
-    user-select: none;
-    transition: transform 0.2s ease;
-}
-
-.card img {
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-}
-
-.card:hover {
-    transform: scale(1.05);
-    z-index: 5;
-}
-
-.hand {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
+#scoreboard {
+  margin-bottom: 20px;
+  font-size: 1.2em;
 }
 
 button {
-    padding: 10px 20px;
-    background-color: #ffcc00;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #222;
+  color: gold;
+  border: 2px solid gold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #ffaa00;
+  background-color: gold;
+  color: #222;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 10px;
+  justify-content: center;
+  margin: 30px auto;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid gold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hand-container {
+  margin-top: 20px;
+}
+
+.hand {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  width: 100px;
+  height: 100px;
+  background-color: #1c1c1c;
+  border: 2px solid gold;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px gold;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player1 .card {
+  box-shadow: 0 0 10px blue;
+  border-color: blue;
+}
+
+.player2 .card {
+  box-shadow: 0 0 10px red;
+  border-color: red;
+}
+
+.occupied {
+  pointer-events: none;
 }
