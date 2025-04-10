@@ -11,16 +11,16 @@ let moves = 0;
 let gameOver = false;
 
 const cards = [
-  { name: 'Ifrit', image: 'ifrit.jpg', power: 5 },
-  { name: 'Shiva', image: 'shiva.jpg', power: 4 },
-  { name: 'Quistis', image: 'quistis.jpg', power: 6 },
-  { name: 'Zell', image: 'zell.jpg', power: 3 },
-  { name: 'Selphie', image: 'selphie.jpg', power: 2 },
-  { name: 'Seifer', image: 'seifer.jpg', power: 7 },
-  { name: 'Squall', image: 'squall.jpg', power: 8 },
-  { name: 'Rinoa', image: 'rinoa.jpg', power: 6 },
-  { name: 'Edea', image: 'edea.jpg', power: 5 },
-  { name: 'Irvine', image: 'irvine.jpg', power: 3 },
+  { name: 'Ifrit', image: 'ifrit.png', power: 5 },
+  { name: 'Shiva', image: 'shiva.png', power: 4 },
+  { name: 'Quistis', image: 'quistis.png', power: 6 },
+  { name: 'Zell', image: 'zell.png', power: 3 },
+  { name: 'Selphie', image: 'selphie.png', power: 2 },
+  { name: 'Seifer', image: 'seifer.png', power: 7 },
+  { name: 'Squall', image: 'squall.png', power: 8 },
+  { name: 'Rinoa', image: 'rinoa.png', power: 6 },
+  { name: 'Edea', image: 'edea.png', power: 5 },
+  { name: 'Irvine', image: 'irvine.png', power: 3 },
 ];
 
 function shuffle(array) {
