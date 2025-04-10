@@ -1,42 +1,39 @@
-/* Triple Triad FFVIII Style */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('img/bg-ffviii.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #fff;
+    font-family: Arial, sans-serif;
     text-align: center;
-    padding: 2rem;
+    background-color: #2b2b2b;
+    color: white;
 }
 
-#game {
+h1 {
+    color: #ffcc00;
+}
+
+.scores {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
+    justify-content: space-around;
+    margin: 20px 0;
 }
 
-#board {
+.board {
     display: grid;
     grid-template-columns: repeat(3, 120px);
     grid-template-rows: repeat(3, 120px);
     gap: 8px;
+    margin: 20px auto;
+    width: 380px;
+    height: 380px;
+    background-color: #333;
 }
 
 .cell {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid #888;
-    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    background-color: #444;
+    border: 2px solid #666;
+    border-radius: 8px;
     position: relative;
-    width: 120px;
-    height: 120px;
-}
-
-.hand {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 100%;
+    transition: background-color 0.3s ease;
 }
 
 .card {
@@ -45,14 +42,16 @@ body {
     background: #111;
     border-radius: 8px;
     position: relative;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
     cursor: grab;
     user-select: none;
     transition: transform 0.2s ease;
 }
 
-.card:active {
-    cursor: grabbing;
+.card img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
 }
 
 .card:hover {
@@ -60,90 +59,21 @@ body {
     z-index: 5;
 }
 
-.card-frame {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px;
-}
-
-.card-top,
-.card-bottom {
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.card-middle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.card-left,
-.card-right {
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.card-img {
-    width: 48px;
-    height: 48px;
-    object-fit: contain;
-    border-radius: 4px;
-    border: 1px solid #fff;
-    background: #222;
-    margin: 0 5px;
-}
-
-.blu {
-    background: linear-gradient(145deg, #0070f3, #0052cc);
-    box-shadow: 0 0 10px rgba(0, 112, 243, 0.6);
-}
-
-.rosso {
-    background: linear-gradient(145deg, #ff3b3b, #b20000);
-    box-shadow: 0 0 10px rgba(255, 59, 59, 0.6);
-}
-
-.flash {
-    animation: flashAnim 0.5s ease-in-out;
-}
-
-@keyframes flashAnim {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.7; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-#status {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 1rem;
-    background: rgba(0,0,0,0.6);
-    padding: 10px 20px;
-    border-radius: 8px;
-}
-
-.scores {
+.hand {
     display: flex;
     justify-content: center;
-    gap: 40px;
-    font-size: 1.25rem;
-    font-weight: bold;
-    background: rgba(0,0,0,0.5);
-    padding: 10px;
-    border-radius: 10px;
+    margin: 20px 0;
 }
 
-h1 {
-    font-family: 'Georgia', serif;
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px #000;
+button {
+    padding: 10px 20px;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ffaa00;
 }
