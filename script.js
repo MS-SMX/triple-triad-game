@@ -1,184 +1,205 @@
-// script.js corretto - Triple Triad FFVIII con animazioni, suoni e salvataggio su Google Sheets
+// script.js - Triple Triad FFVIII Style
 
-const board = document.getElementById("board");
-const hand1 = document.getElementById("hand1");
-const hand2 = document.getElementById("hand2");
-const status = document.getElementById("status");
-const score1 = document.getElementById("score1");
-const score2 = document.getElementById("score2");
-
-const audioFlip = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c381d8243a.mp3");
-const audioVictory = new Audio("https://cdn.pixabay.com/audio/2022/03/17/audio_801d484276.mp3");
-const audioDraw = new Audio("https://cdn.pixabay.com/audio/2021/08/04/audio_a0f3f24695.mp3");
+const board = document.getElementById('board');
+const hand1 = document.getElementById('hand1');
+const hand2 = document.getElementById('hand2');
+const status = document.getElementById('status');
+const score1 = document.getElementById('score1');
+const score2 = document.getElementById('score2');
 
 let currentPlayer = 1;
-let mosseTotali = 0;
+let moves = 0;
 
-const carteGiocatore1 = [
-  { nome: "Ifrit", valori: { n: 9, e: 8, s: 6, o: 2 }, colore: "blu" },
-  { nome: "Shiva", valori: { n: 6, e: 4, s: 9, o: 2 }, colore: "blu" },
-  { nome: "Quetzal", valori: { n: 7, e: 6, s: 3, o: 8 }, colore: "blu" },
-  { nome: "Squall", valori: { n: 5, e: 9, s: 7, o: 4 }, colore: "blu" },
-  { nome: "Zell", valori: { n: 3, e: 5, s: 4, o: 8 }, colore: "blu" }
+const cardsP1 = [
+  { name: 'Ifrit', up: 5, down: 2, left: 3, right: 6 },
+  { name: 'Shiva', up: 7, down: 3, left: 1, right: 4 },
+  { name: 'Quezacotl', up: 6, down: 4, left: 2, right: 5 },
+  { name: 'Siren', up: 3, down: 6, left: 4, right: 2 },
+  { name: 'Brothers', up: 4, down: 5, left: 6, right: 1 }
 ];
 
-const carteGiocatore2 = [
-  { nome: "Bomb", valori: { n: 2, e: 6, s: 7, o: 5 }, colore: "rosso" },
-  { nome: "T-Rexaur", valori: { n: 8, e: 7, s: 4, o: 6 }, colore: "rosso" },
-  { nome: "Tonberry", valori: { n: 5, e: 9, s: 2, o: 7 }, colore: "rosso" },
-  { nome: "Elnoyle", valori: { n: 6, e: 6, s: 5, o: 7 }, colore: "rosso" },
-  { nome: "Funguar", valori: { n: 4, e: 3, s: 6, o: 8 }, colore: "rosso" }
+const cardsP2 = [
+  { name: 'Diablos', up: 4, down: 5, left: 3, right: 6 },
+  { name: 'Carbuncle', up: 2, down: 7, left: 5, right: 1 },
+  { name: 'Leviathan', up: 3, down: 6, left: 1, right: 4 },
+  { name: 'Bahamut', up: 6, down: 2, left: 4, right: 7 },
+  { name: 'Doomtrain', up: 5, down: 1, left: 7, right: 2 }
 ];
 
-function creaCarta(carta, index, player) {
-  const div = document.createElement("div");
-  div.className = `card ${carta.colore}`;
+function createCard(card, player) {
+  const div = document.createElement('div');
+  div.className = `card ${player === 1 ? 'blu' : 'rosso'}`;
   div.draggable = true;
-  div.dataset.index = index;
   div.dataset.player = player;
-  div.dataset.nome = carta.nome;
-  div.dataset.valori = JSON.stringify(carta.valori);
-
+  div.dataset.up = card.up;
+  div.dataset.down = card.down;
+  div.dataset.left = card.left;
+  div.dataset.right = card.right;
+  div.dataset.name = card.name;
   div.innerHTML = `
     <div class="card-frame">
-      <div class="card-top">${carta.valori.n}</div>
+      <div class="card-top">${card.up}</div>
       <div class="card-middle">
-        <div class="card-left">${carta.valori.o}</div>
-        <div class="card-name">${carta.nome}</div>
-        <div class="card-right">${carta.valori.e}</div>
+        <div class="card-left">${card.left}</div>
+        <div class="card-name">${card.name}</div>
+        <div class="card-right">${card.right}</div>
       </div>
-      <div class="card-bottom">${carta.valori.s}</div>
-    </div>
-  `;
-
-  div.addEventListener("dragstart", (e) => {
-    e.dataTransfer.setData("text/plain", JSON.stringify(carta));
-    e.dataTransfer.setData("from-player", player);
-    e.dataTransfer.setData("card-index", index);
-  });
-
+      <div class="card-bottom">${card.down}</div>
+    </div>`;
+  div.addEventListener('dragstart', dragStart);
   return div;
 }
 
-function creaGriglia() {
+function init() {
+  board.innerHTML = '';
+  hand1.innerHTML = '';
+  hand2.innerHTML = '';
+  moves = 0;
+  currentPlayer = 1;
+  score1.textContent = 0;
+  score2.textContent = 0;
+
   for (let i = 0; i < 9; i++) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cell.dataset.index = i;
-
-    cell.addEventListener("dragover", (e) => e.preventDefault());
-    cell.addEventListener("drop", (e) => {
-      e.preventDefault();
-      if (cell.children.length > 0) return;
-
-      const datiCarta = JSON.parse(e.dataTransfer.getData("text/plain"));
-      const fromPlayer = parseInt(e.dataTransfer.getData("from-player"));
-      const cardIndex = parseInt(e.dataTransfer.getData("card-index"));
-
-      if (fromPlayer !== currentPlayer) return;
-
-      const carta = creaCarta(datiCarta, cardIndex, fromPlayer);
-      carta.draggable = false;
-      cell.appendChild(carta);
-
-      aggiornaConquiste(cell, datiCarta);
-
-      if (fromPlayer === 1) {
-        const carte = hand1.querySelectorAll('.card');
-        hand1.removeChild(carte[cardIndex]);
-      } else {
-        const carte = hand2.querySelectorAll('.card');
-        hand2.removeChild(carte[cardIndex]);
-      }
-
-      mosseTotali++;
-      aggiornaPunteggi();
-
-      if (mosseTotali >= 9) {
-        const messaggio = "Partita terminata! " + determinaVincitore();
-        status.textContent = messaggio;
-        salvaStatistiche();
-        return;
-      }
-
-      currentPlayer = currentPlayer === 1 ? 2 : 1;
-      status.textContent = `Turno: Giocatore ${currentPlayer}`;
-    });
-
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.addEventListener('dragover', dragOver);
+    cell.addEventListener('drop', drop);
     board.appendChild(cell);
   }
+
+  cardsP1.forEach(card => hand1.appendChild(createCard(card, 1)));
+  cardsP2.forEach(card => hand2.appendChild(createCard(card, 2)));
+
+  updateStatus();
 }
 
-function aggiornaConquiste(cell, carta) {
-  const i = parseInt(cell.dataset.index);
-  const adiacenti = {
-    n: i - 3,
-    e: i % 3 < 2 ? i + 1 : -1,
-    s: i + 3,
-    o: i % 3 > 0 ? i - 1 : -1
-  };
+function dragStart(e) {
+  const card = e.target;
+  if (parseInt(card.dataset.player) !== currentPlayer) {
+    e.preventDefault();
+    return;
+  }
+  e.dataTransfer.setData('text/plain', JSON.stringify({
+    up: card.dataset.up,
+    down: card.dataset.down,
+    left: card.dataset.left,
+    right: card.dataset.right,
+    name: card.dataset.name,
+    player: card.dataset.player
+  }));
+  e.dataTransfer.setData('card-id', card.outerHTML);
+  e.target.classList.add('dragging');
+}
 
-  for (const dir in adiacenti) {
-    const idx = adiacenti[dir];
-    if (idx < 0 || idx > 8) continue;
+function dragOver(e) {
+  e.preventDefault();
+}
 
-    const adiacente = board.children[idx];
-    if (adiacente.children.length === 0) continue;
+function drop(e) {
+  e.preventDefault();
+  const cell = e.target.closest('.cell');
+  if (!cell || cell.children.length > 0) return;
 
-    const cartaNemica = adiacente.children[0];
-    const valoriNemico = JSON.parse(cartaNemica.dataset.valori);
+  const data = JSON.parse(e.dataTransfer.getData('text'));
+  const cardEl = createCard(data, data.player);
+  cardEl.draggable = false;
+  cardEl.classList.add('placed');
+  cell.appendChild(cardEl);
 
-    const latoOpposto = { n: "s", e: "o", s: "n", o: "e" }[dir];
-    if (carta.valori[dir] > valoriNemico[latoOpposto]) {
-      cartaNemica.classList.remove("rosso", "blu");
-      cartaNemica.classList.add(carta.colore);
-      cartaNemica.dataset.player = currentPlayer;
-      cartaNemica.classList.add("flash");
-      setTimeout(() => cartaNemica.classList.remove("flash"), 500);
-      audioFlip.play();
-    }
+  // Remove from hand
+  const originalCard = document.querySelector(`.hand .card[data-name='${data.name}'][data-player='${data.player}']`);
+  if (originalCard) originalCard.remove();
+
+  checkCapture(cell, cardEl);
+
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
+  moves++;
+
+  updateScores();
+  updateStatus();
+
+  if (moves === 9) {
+    checkWinner();
   }
 }
 
-function aggiornaPunteggi() {
-  let p1 = 0, p2 = 0;
-  const cards = document.querySelectorAll(".cell .card");
-  cards.forEach(c => {
-    if (c.classList.contains("blu")) p1++;
-    else if (c.classList.contains("rosso")) p2++;
+function updateScores() {
+  const allCards = document.querySelectorAll('.placed');
+  let p1 = 0;
+  let p2 = 0;
+  allCards.forEach(card => {
+    if (parseInt(card.dataset.player) === 1) p1++;
+    else p2++;
   });
   score1.textContent = p1;
   score2.textContent = p2;
 }
 
-function determinaVincitore() {
-  const s1 = parseInt(score1.textContent);
-  const s2 = parseInt(score2.textContent);
-  if (s1 > s2) { audioVictory.play(); return "Vince il Giocatore 1!"; }
-  if (s2 > s1) { audioVictory.play(); return "Vince il Giocatore 2!"; }
-  audioDraw.play();
-  return "Pareggio!";
+function updateStatus() {
+  status.textContent = `Turno del Giocatore ${currentPlayer}`;
 }
 
-function salvaStatistiche() {
-  const nome = prompt("Inserisci il tuo nome per salvare il punteggio:");
-  const punti1 = score1.textContent;
-  const punti2 = score2.textContent;
+function checkWinner() {
+  const p1 = parseInt(score1.textContent);
+  const p2 = parseInt(score2.textContent);
+  if (p1 > p2) {
+    status.textContent = '🎉 Vittoria del Giocatore 1!';
+    playSound('win');
+  } else if (p2 > p1) {
+    status.textContent = '🎉 Vittoria del Giocatore 2!';
+    playSound('win');
+  } else {
+    status.textContent = '🤝 Pareggio!';
+    playSound('draw');
+  }
+}
 
-  fetch("https://script.google.com/macros/s/AKfycbyUJJZHmtdJ54q1-4GVRMazfzeZZcx9ylt8ZSCQtQD369qLXLxycos8ON9IegPvQ1OqZw/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome, punti1, punti2, data: new Date().toISOString() })
+function checkCapture(cell, card) {
+  const index = Array.from(board.children).indexOf(cell);
+  const directions = [
+    { dx: -1, dy: 0, side: 'left', opposite: 'right' },
+    { dx: 1, dy: 0, side: 'right', opposite: 'left' },
+    { dx: 0, dy: -1, side: 'up', opposite: 'down' },
+    { dx: 0, dy: 1, side: 'down', opposite: 'up' }
+  ];
+
+  const row = Math.floor(index / 3);
+  const col = index % 3;
+
+  directions.forEach(dir => {
+    const newRow = row + dir.dy;
+    const newCol = col + dir.dx;
+    if (newRow >= 0 && newRow < 3 && newCol >= 0 && newCol < 3) {
+      const adjacentIndex = newRow * 3 + newCol;
+      const adjacentCell = board.children[adjacentIndex];
+      const otherCard = adjacentCell.querySelector('.placed');
+
+      if (otherCard && otherCard.dataset.player !== card.dataset.player) {
+        const attacker = parseInt(card.dataset[dir.side]);
+        const defender = parseInt(otherCard.dataset[dir.opposite]);
+        if (attacker > defender) {
+          otherCard.dataset.player = card.dataset.player;
+          otherCard.classList.remove('rosso', 'blu');
+          otherCard.classList.add(card.dataset.player == 1 ? 'blu' : 'rosso', 'flash');
+          playSound('capture');
+          updateScores();
+        }
+      }
+    }
   });
 }
 
-function avviaGioco() {
-  carteGiocatore1.forEach((c, i) => hand1.appendChild(creaCarta(c, i, 1)));
-  carteGiocatore2.forEach((c, i) => hand2.appendChild(creaCarta(c, i, 2)));
-  creaGriglia();
-  aggiornaPunteggi();
-  status.textContent = "Turno: Giocatore 1";
+function playSound(type) {
+  let src = '';
+  switch (type) {
+    case 'win': src = 'https://www.myinstants.com/media/sounds/victory-ff.mp3'; break;
+    case 'capture': src = 'https://www.myinstants.com/media/sounds/pop.mp3'; break;
+    case 'draw': src = 'https://www.myinstants.com/media/sounds/mario-coin.mp3'; break;
+  }
+  if (src) {
+    const audio = new Audio(src);
+    audio.play();
+  }
 }
 
-avviaGioco();
+init();
