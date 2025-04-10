@@ -1,24 +1,31 @@
-<!-- === index.html === -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Triple Triad</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Triple Triad</h1>
-  <div class="game">
-    <div id="player1-hand" class="hand"></div>
-    <div id="board" class="board"></div>
-    <div id="player2-hand" class="hand"></div>
+  <div class="game-container">
+    <h1>Triple Triad</h1>
+    <div class="scoreboard">
+      <div class="player-score" id="player1-score">Giocatore 1: 0</div>
+      <div class="player-score" id="player2-score">Giocatore 2: 0</div>
+    </div>
+
+    <div class="board" id="board">
+      <!-- Celle della griglia 3x3 -->
+    </div>
+
+    <div class="hands">
+      <div class="hand" id="player1-hand"></div>
+      <div class="hand" id="player2-hand"></div>
+    </div>
+
+    <div class="status" id="game-status"></div>
   </div>
-  <div class="scoreboard">
-    <span id="score-player1">Player 1: 0</span>
-    <span id="score-player2">Player 2: 0</span>
-  </div>
-  <div id="winner"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
