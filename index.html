@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triple Triad</title>
+  <title>Triple Triad - Final Fantasy VIII</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="game-container">
-    <h1>Triple Triad</h1>
-    <div class="scoreboard">
-      <div class="player-score" id="player1-score">Giocatore 1: 0</div>
-      <div class="player-score" id="player2-score">Giocatore 2: 0</div>
-    </div>
+  <h1>Triple Triad</h1>
+  <div id="scoreboard">
+    <span id="score1">Giocatore 1: 0</span>
+    <span id="score2">Giocatore 2: 0</span>
+    <button id="resetButton">Reset</button>
+  </div>
 
-    <div class="board" id="board">
-      <!-- Celle della griglia 3x3 -->
-    </div>
+  <div class="hand-container">
+    <h2>Mano Giocatore 1</h2>
+    <div id="hand1" class="hand"></div>
+  </div>
 
-    <div class="hands">
-      <div class="hand" id="player1-hand"></div>
-      <div class="hand" id="player2-hand"></div>
-    </div>
+  <div id="board" class="board"></div>
 
-    <div class="status" id="game-status"></div>
+  <div class="hand-container">
+    <h2>Mano Giocatore 2</h2>
+    <div id="hand2" class="hand"></div>
   </div>
 
   <script src="script.js"></script>
