@@ -18,99 +18,120 @@ const cards = [
     { name: "Titan", image: "titan.png", stats: [2, 5, 4, 3] },
     { name: "Leviathan", image: "leviathan.png", stats: [3, 4, 2, 5] },
     { name: "Diablos", image: "diablos.png", stats: [4, 3, 5, 2] },
-    { name: "Siren", image: "siren.png", stats: [3, 3, 4, 4] }
+    { name: "Siren", image: "siren.png", stats: [3, 3, 4, 4] },
+    { name: "Cactuar", image: "cactuar.png", stats: [1, 5, 1, 5] },
+    { name: "Tonberry", image: "tonberry.png", stats: [3, 2, 4, 4] }
 ];
 
-// Funzione per mescolare il mazzo di carte
 function shuffleDeck(deck) {
-    return deck.sort(() => Math.random() - 0.5);
+    return [...deck].sort(() => Math.random() - 0.5);
 }
 
-// Creazione delle carte
 function createCard(card) {
     const cardElement = document.createElement('div');
     cardElement.className = 'card';
     cardElement.setAttribute('draggable', true);
-    cardElement.setAttribute('data-card', JSON.stringify(card)); // Impostiamo i dati della carta
-    
+
+    const cardJson = JSON.stringify(card);
+    cardElement.setAttribute('data-card', cardJson);
+
     const img = document.createElement('img');
     img.src = `img/${card.image}`;
     img.alt = card.name;
-    
-    cardElement.appendChild(img);
 
+    cardElement.appendChild(img);
     cardElement.addEventListener('dragstart', dragStart);
-    cardElement.addEventListener('dragend', dragEnd);
 
     return cardElement;
 }
 
-// Quando inizia il drag
 function dragStart(event) {
-    // Passiamo i dati della carta come JSON durante il drag
-    const cardData = event.target.dataset.card;
-    event.dataTransfer.setData('text/plain', cardData); // Salviamo la carta come stringa JSON
+    const cardData = event.target.getAttribute('data-card');
+    if (cardData) {
+        event.dataTransfer.setData('application/json', cardData);
+    } else {
+        console.warn("Carta trascinata senza data-card valido.");
+    }
 }
 
-// Quando termina il drag
-function dragEnd(event) {
-    // Eventuale logica dopo il drag
-}
-
-// Prevenire l'azione di default quando si trascina sopra la cella
 function dragOver(event) {
     event.preventDefault();
 }
 
-// Quando la carta viene rilasciata sulla cella
 function drop(event) {
     event.preventDefault();
-    
-    // Recuperiamo i dati della carta
-    const cardData = event.dataTransfer.getData('text/plain');
-    
-    if (cardData) {  // Se ci sono dati validi
-        try {
-            const card = JSON.parse(cardData);  // Parso i dati JSON per ottenere la carta
-            const cell = event.target;
+    const cardData = event.dataTransfer.getData('application/json');
 
-            if (!cell.hasChildNodes()) { // Se la cella non è già occupata
-                // Impostiamo la cella come occupata dalla carta
-                cell.style.backgroundColor = "#444"; // Cambiamo colore della cella per segnalarla come occupata
-                const cardElement = createCard(card);
-                cell.appendChild(cardElement); // Aggiungiamo la carta alla cella
+    if (!cardData) {
+        console.error("Nessun dato valido ricevuto nel drop.");
+        return;
+    }
 
-                moves++;
-                currentPlayer = currentPlayer === 1 ? 2 : 1; // Alterniamo il turno tra i giocatori
-                updateStatus();
+    try {
+        const card = JSON.parse(cardData);
+        const cell = event.target.closest('.cell');
+
+        if (!cell || cell.hasChildNodes()) return;
+
+        const cardElement = createCard(card);
+        cardElement.setAttribute('draggable', false);
+        cardElement.classList.add(`player${currentPlayer}`);
+        cell.appendChild(cardElement);
+        cell.classList.add(`occupied`, `player${currentPlayer}`);
+
+        // Rimuovi la carta dalla mano
+        const allCards = document.querySelectorAll(`.hand .card`);
+        allCards.forEach(c => {
+            if (c.getAttribute('data-card') === JSON.stringify(card)) {
+                c.remove();
             }
-        } catch (error) {
-            console.error("Errore durante il parsing della carta:", error);
-        }
-    } else {
-        console.error("Nessun dato valido per la carta.");
+        });
+
+        moves++;
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+        updateStatus();
+
+        if (moves >= 9) checkGameEnd();
+    } catch (e) {
+        console.error("Errore nel parsing JSON:", e);
     }
 }
 
-// Aggiorniamo lo stato del punteggio
 function updateStatus() {
     score1.textContent = `Giocatore 1: ${player1Score}`;
     score2.textContent = `Giocatore 2: ${player2Score}`;
 }
 
-// Inizializzazione del gioco
+function checkGameEnd() {
+    let player1Count = document.querySelectorAll('.player1').length;
+    let player2Count = document.querySelectorAll('.player2').length;
+
+    let result = '';
+    if (player1Count > player2Count) {
+        result = 'Giocatore 1 vince!';
+        player1Score++;
+    } else if (player2Count > player1Count) {
+        result = 'Giocatore 2 vince!';
+        player2Score++;
+    } else {
+        result = 'Pareggio!';
+    }
+
+    updateStatus();
+    setTimeout(() => alert(`Partita terminata!\n${result}`), 100);
+}
+
 function init() {
     board.innerHTML = '';
     hand1.innerHTML = '';
     hand2.innerHTML = '';
     moves = 0;
     currentPlayer = 1;
-    player1Score = 0;
-    player2Score = 0;
-    score1.textContent = 0;
-    score2.textContent = 0;
 
-    // Creiamo il tabellone
+    const deck = shuffleDeck(cards);
+    const player1Hand = deck.slice(0, 5);
+    const player2Hand = deck.slice(5, 10);
+
     for (let i = 0; i < 9; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
@@ -119,20 +140,17 @@ function init() {
         board.appendChild(cell);
     }
 
-    const shuffledDeck = shuffleDeck(cards);
-    const player1Hand = shuffledDeck.slice(0, 5);
-    const player2Hand = shuffledDeck.slice(5, 10);
+    player1Hand.forEach(card => {
+        hand1.appendChild(createCard(card));
+    });
 
-    // Creiamo le carte per il Giocatore 1
-    player1Hand.forEach(card => hand1.appendChild(createCard(card)));
-    // Creiamo le carte per il Giocatore 2
-    player2Hand.forEach(card => hand2.appendChild(createCard(card)));
+    player2Hand.forEach(card => {
+        hand2.appendChild(createCard(card));
+    });
 
     updateStatus();
 }
 
-// Ricominciare la partita
 resetButton.addEventListener('click', init);
 
-// Avvia il gioco all'inizio
 init();
