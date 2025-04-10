@@ -165,7 +165,7 @@ function salvaStatistiche() {
   const punti1 = score1.textContent;
   const punti2 = score2.textContent;
 
-  fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyUJJZHmtdJ54q1-4GVRMazfzeZZcx9ylt8ZSCQtQD369qLXLxycos8ON9IegPvQ1OqZw/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
