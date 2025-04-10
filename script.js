@@ -1,4 +1,4 @@
-// script.js corretto - Triple Triad FFVIII
+// script.js corretto - Triple Triad FFVIII con animazioni, suoni e salvataggio su Google Sheets
 
 const board = document.getElementById("board");
 const hand1 = document.getElementById("hand1");
@@ -6,6 +6,10 @@ const hand2 = document.getElementById("hand2");
 const status = document.getElementById("status");
 const score1 = document.getElementById("score1");
 const score2 = document.getElementById("score2");
+
+const audioFlip = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c381d8243a.mp3");
+const audioVictory = new Audio("https://cdn.pixabay.com/audio/2022/03/17/audio_801d484276.mp3");
+const audioDraw = new Audio("https://cdn.pixabay.com/audio/2021/08/04/audio_a0f3f24695.mp3");
 
 let currentPlayer = 1;
 let mosseTotali = 0;
@@ -93,6 +97,7 @@ function creaGriglia() {
       if (mosseTotali >= 9) {
         const messaggio = "Partita terminata! " + determinaVincitore();
         status.textContent = messaggio;
+        salvaStatistiche();
         return;
       }
 
@@ -128,6 +133,9 @@ function aggiornaConquiste(cell, carta) {
       cartaNemica.classList.remove("rosso", "blu");
       cartaNemica.classList.add(carta.colore);
       cartaNemica.dataset.player = currentPlayer;
+      cartaNemica.classList.add("flash");
+      setTimeout(() => cartaNemica.classList.remove("flash"), 500);
+      audioFlip.play();
     }
   }
 }
@@ -146,9 +154,23 @@ function aggiornaPunteggi() {
 function determinaVincitore() {
   const s1 = parseInt(score1.textContent);
   const s2 = parseInt(score2.textContent);
-  if (s1 > s2) return "Vince il Giocatore 1!";
-  if (s2 > s1) return "Vince il Giocatore 2!";
+  if (s1 > s2) { audioVictory.play(); return "Vince il Giocatore 1!"; }
+  if (s2 > s1) { audioVictory.play(); return "Vince il Giocatore 2!"; }
+  audioDraw.play();
   return "Pareggio!";
+}
+
+function salvaStatistiche() {
+  const nome = prompt("Inserisci il tuo nome per salvare il punteggio:");
+  const punti1 = score1.textContent;
+  const punti2 = score2.textContent;
+
+  fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome, punti1, punti2, data: new Date().toISOString() })
+  });
 }
 
 function avviaGioco() {
