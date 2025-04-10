@@ -1,156 +1,150 @@
-/* style.css - Triple Triad FFVIII Inspired */
+/* style.css - Triple Triad FFVIII Style */
 
 body {
-  background: url('https://i.imgur.com/fYk2Ssi.jpg') no-repeat center center fixed;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('img/bg-ffviii.jpg') no-repeat center center fixed;
   background-size: cover;
-  font-family: 'Trebuchet MS', sans-serif;
   color: #fff;
   text-align: center;
-  padding: 20px;
+  padding: 2rem;
 }
 
-#game-container {
-  max-width: 960px;
-  margin: auto;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 0 20px #000;
-}
-
-h1 {
-  font-size: 2em;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px 4px #000;
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
 }
 
 #board {
   display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 140px);
-  gap: 10px;
-  justify-content: center;
-  margin: 20px auto;
+  grid-template-columns: repeat(3, 120px);
+  grid-template-rows: repeat(3, 120px);
+  gap: 8px;
 }
 
 .cell {
-  width: 100px;
-  height: 140px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid #ccc;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #888;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.hand {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
 }
 
 .card {
-  width: 90px;
-  height: 130px;
-  background: #222;
-  border-radius: 10px;
-  border: 2px solid #fff;
-  box-shadow: 0 0 10px #000;
+  width: 100px;
+  height: 100px;
+  background: #111;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
   cursor: grab;
   user-select: none;
-  transition: transform 0.3s;
+  transition: transform 0.2s ease;
+}
+
+.card:active {
+  cursor: grabbing;
 }
 
 .card:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  z-index: 5;
 }
 
 .card-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  color: #fff;
-  font-weight: bold;
-  position: relative;
+  justify-content: space-between;
+  align-items: center;
   padding: 5px;
-  text-shadow: 1px 1px 2px #000;
 }
 
-.card-top, .card-bottom {
-  text-align: center;
-  font-size: 1.2em;
+.card-top,
+.card-bottom {
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .card-middle {
-  flex-grow: 1;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 1.2em;
-  padding: 0 5px;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.card-left, .card-right {
-  width: 20%;
+.card-left,
+.card-right {
+  font-weight: bold;
+  font-size: 14px;
 }
 
-.card-name {
-  flex-grow: 1;
-  font-size: 0.9em;
+.card-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #fff;
+  background: #222;
+  margin: 0 5px;
 }
 
 .blu {
-  background: linear-gradient(to bottom, #2257ff, #0a134a);
-  border-color: #aaddff;
-  box-shadow: 0 0 10px #00f;
+  background: linear-gradient(145deg, #0070f3, #0052cc);
+  box-shadow: 0 0 10px rgba(0, 112, 243, 0.6);
 }
 
 .rosso {
-  background: linear-gradient(to bottom, #ff2222, #4a0a0a);
-  border-color: #ffaaaa;
-  box-shadow: 0 0 10px #f00;
+  background: linear-gradient(145deg, #ff3b3b, #b20000);
+  box-shadow: 0 0 10px rgba(255, 59, 59, 0.6);
 }
 
 .flash {
-  animation: flash 0.4s ease-in-out;
+  animation: flashAnim 0.5s ease-in-out;
 }
 
-@keyframes flash {
-  0% { transform: scale(1); filter: brightness(1); }
-  50% { transform: scale(1.2); filter: brightness(1.5); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-
-#hand1, #hand2 {
-  display: flex;
-  justify-content: center;
-  margin: 10px auto;
-  gap: 10px;
-  flex-wrap: wrap;
+@keyframes flashAnim {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 #status {
-  font-size: 1.3em;
-  margin: 10px 0;
-}
-
-#scoreboard {
-  margin: 20px 0;
-  font-size: 1.2em;
-  display: flex;
-  justify-content: space-around;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-button {
-  margin-top: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  background: rgba(0,0,0,0.6);
   padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #444;
-  color: white;
-  font-size: 1em;
-  cursor: pointer;
+  border-radius: 8px;
 }
 
-button:hover {
-  background: #666;
+.scores {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  background: rgba(0,0,0,0.5);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+h1 {
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px #000;
 }
