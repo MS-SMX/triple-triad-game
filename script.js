@@ -49,6 +49,45 @@ let gameOver = false;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const cards = [
   { name: 'Ifrit', image: 'ifrit.png', power: 5 },
   { name: 'Shiva', image: 'shiva.png', power: 4 },
