@@ -58,36 +58,4 @@ function dragEnd(event) {
 }
 
 // Prevenire l'azione di default quando si trascina sopra la cella
-function dragOver(event) {
-    event.preventDefault();
-}
-
-// Quando la carta viene rilasciata sulla cella
-function drop(event) {
-    event.preventDefault();
-    
-    // Recuperiamo i dati della carta
-    const cardData = event.dataTransfer.getData('text/plain');
-    
-    if (cardData) {  // Se ci sono dati validi
-        const card = JSON.parse(cardData);  // Parso i dati JSON per ottenere la carta
-
-        const cell = event.target;
-        if (!cell.hasChildNodes()) { // Se la cella non è già occupata
-            // Impostiamo la cella come occupata dalla carta
-            cell.style.backgroundColor = "#444"; // Cambiamo colore della cella per segnalarla come occupata
-            const cardElement = createCard(card);
-            cell.appendChild(cardElement); // Aggiungiamo la carta alla cella
-
-            moves++;
-            currentPlayer = currentPlayer === 1 ? 2 : 1; // Alterniamo il turno tra i giocatori
-            updateStatus();
-        }
-    } else {
-        console.error("Nessun dato valido per la carta.");
-    }
-}
-
-// Aggiorniamo lo stato del punteggio
-function updateStatus() {
-    score1.textContent = `Giocatore
+function
