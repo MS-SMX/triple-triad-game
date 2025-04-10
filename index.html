@@ -5,20 +5,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triple Triad - FFVIII</title>
+  <title>Triple Triad FFVIII</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Triple Triad</h1>
-  <div id="game">
-    <div id="hand1"></div>
+  <div id="game-container">
+    <h1>Triple Triad</h1>
+
+    <div id="scoreboard">
+      <div>Giocatore 1: <span id="score1">0</span></div>
+      <div>Giocatore 2: <span id="score2">0</span></div>
+    </div>
+
+    <div id="hand1" class="hand"></div>
     <div id="board"></div>
-    <div id="hand2"></div>
-  </div>
-  <div id="status">Caricamento...</div>
-  <div id="punteggi">
-    <span>Giocatore 1: <span id="score1">0</span></span> | 
-    <span>Giocatore 2: <span id="score2">0</span></span>
+    <div id="hand2" class="hand"></div>
+
+    <div id="status">In attesa del primo turno...</div>
   </div>
 
   <script src="script.js"></script>
