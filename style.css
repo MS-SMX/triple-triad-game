@@ -68,7 +68,8 @@ button:hover {
 .card {
   width: 100px;
   height: 100px;
-  background-color: #1c1c1c;
+  background-color: transparent;
+  position: relative;
   border: 2px solid gold;
   border-radius: 8px;
   overflow: hidden;
