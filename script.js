@@ -1,4 +1,4 @@
-// --- script.js ---
+// script.js corretto - Triple Triad FFVIII
 
 const board = document.getElementById("board");
 const hand1 = document.getElementById("hand1");
@@ -13,13 +13,17 @@ let mosseTotali = 0;
 const carteGiocatore1 = [
   { nome: "Ifrit", valori: { n: 9, e: 8, s: 6, o: 2 }, colore: "blu" },
   { nome: "Shiva", valori: { n: 6, e: 4, s: 9, o: 2 }, colore: "blu" },
-  { nome: "Quetzal", valori: { n: 7, e: 6, s: 3, o: 8 }, colore: "blu" }
+  { nome: "Quetzal", valori: { n: 7, e: 6, s: 3, o: 8 }, colore: "blu" },
+  { nome: "Squall", valori: { n: 5, e: 9, s: 7, o: 4 }, colore: "blu" },
+  { nome: "Zell", valori: { n: 3, e: 5, s: 4, o: 8 }, colore: "blu" }
 ];
 
 const carteGiocatore2 = [
   { nome: "Bomb", valori: { n: 2, e: 6, s: 7, o: 5 }, colore: "rosso" },
   { nome: "T-Rexaur", valori: { n: 8, e: 7, s: 4, o: 6 }, colore: "rosso" },
-  { nome: "Tonberry", valori: { n: 5, e: 9, s: 2, o: 7 }, colore: "rosso" }
+  { nome: "Tonberry", valori: { n: 5, e: 9, s: 2, o: 7 }, colore: "rosso" },
+  { nome: "Elnoyle", valori: { n: 6, e: 6, s: 5, o: 7 }, colore: "rosso" },
+  { nome: "Funguar", valori: { n: 4, e: 3, s: 6, o: 8 }, colore: "rosso" }
 ];
 
 function creaCarta(carta, index, player) {
@@ -74,22 +78,21 @@ function creaGriglia() {
       cell.appendChild(carta);
 
       aggiornaConquiste(cell, datiCarta);
-      aggiornaPunteggi();
 
-      const tutteCarte = fromPlayer === 1 ? hand1.querySelectorAll('.card') : hand2.querySelectorAll('.card');
       if (fromPlayer === 1) {
-        hand1.removeChild(tutteCarte[cardIndex]);
+        const carte = hand1.querySelectorAll('.card');
+        hand1.removeChild(carte[cardIndex]);
       } else {
-        hand2.removeChild(tutteCarte[cardIndex]);
+        const carte = hand2.querySelectorAll('.card');
+        hand2.removeChild(carte[cardIndex]);
       }
 
       mosseTotali++;
+      aggiornaPunteggi();
+
       if (mosseTotali >= 9) {
-        aggiornaPunteggi();
-        setTimeout(() => {
-          const messaggio = "Partita terminata! " + determinaVincitore();
-          status.textContent = messaggio;
-        }, 100);
+        const messaggio = "Partita terminata! " + determinaVincitore();
+        status.textContent = messaggio;
         return;
       }
 
@@ -131,10 +134,10 @@ function aggiornaConquiste(cell, carta) {
 
 function aggiornaPunteggi() {
   let p1 = 0, p2 = 0;
-  const cards = document.querySelectorAll(".board .card");
+  const cards = document.querySelectorAll(".cell .card");
   cards.forEach(c => {
-    const colore = c.classList.contains("blu") ? 1 : 2;
-    colore === 1 ? p1++ : p2++;
+    if (c.classList.contains("blu")) p1++;
+    else if (c.classList.contains("rosso")) p2++;
   });
   score1.textContent = p1;
   score2.textContent = p2;
