@@ -1,84 +1,39 @@
-/* === style.css === */
-body {
-  background-color: #1c1c1c;
-  font-family: 'Verdana', sans-serif;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triple Triad</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="game-container">
+    <h1>Triple Triad</h1>
+    <div class="scoreboard">
+      <div class="player-score" id="player1-score">Giocatore 1: 0</div>
+      <div class="player-score" id="player2-score">Giocatore 2: 0</div>
+    </div>
 
-h1 {
-  margin-bottom: 20px;
-}
+    <div class="board" id="board">
+      <div class="cell" data-position="0"></div>
+      <div class="cell" data-position="1"></div>
+      <div class="cell" data-position="2"></div>
+      <div class="cell" data-position="3"></div>
+      <div class="cell" data-position="4"></div>
+      <div class="cell" data-position="5"></div>
+      <div class="cell" data-position="6"></div>
+      <div class="cell" data-position="7"></div>
+      <div class="cell" data-position="8"></div>
+    </div>
 
-.game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    <div class="hands">
+      <div class="hand player1" id="player1-hand"></div>
+      <div class="hand player2" id="player2-hand"></div>
+    </div>
 
-.hand {
-  display: flex;
-  gap: 10px;
-  margin: 10px;
-}
+    <div class="status" id="game-status"></div>
+  </div>
 
-.board {
-  display: grid;
-  grid-template-columns: repeat(3, 120px);
-  grid-template-rows: repeat(3, 120px);
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.card {
-  width: 120px;
-  height: 120px;
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: transparent;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-}
-
-.card img {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-  z-index: 1;
-  position: relative;
-}
-
-.card.player1 { background-color: rgba(0, 0, 255, 0.2); }
-.card.player2 { background-color: rgba(255, 0, 0, 0.2); }
-
-.value {
-  position: absolute;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  text-shadow: 0 0 3px black;
-  z-index: 2;
-}
-
-.top { top: 4px; left: 50%; transform: translateX(-50%); }
-.right { top: 50%; right: 4px; transform: translateY(-50%); }
-.bottom { bottom: 4px; left: 50%; transform: translateX(-50%); }
-.left { top: 50%; left: 4px; transform: translateY(-50%); }
-
-.scoreboard {
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-#winner {
-  margin-top: 20px;
-  font-size: 1.5rem;
-  color: yellow;
-}
+  <script src="script.js"></script>
+</body>
+</html>
