@@ -1,160 +1,192 @@
-let currentPlayer = 1;  // Iniziamo con il giocatore 1
-let player1Cards = [];
-let player2Cards = [];
-let placedCards = 0;
+// Inizializzazione delle variabili
 let board = [
   [null, null, null],
   [null, null, null],
   [null, null, null]
 ];
+let currentPlayer = 1;  // 1 per Player 1, 2 per Player 2
+let placedCards = 0;
+let player1Score = 0;
+let player2Score = 0;
 
-// Eseguiamo l'inizializzazione del gioco
-function initializeGame() {
-  setupHands();
-  updateActivePlayer();
-  setupEventListeners();
-}
-
-// Crea le mani per entrambi i giocatori
-function setupHands() {
-  // Esempio di carte per i giocatori
-  player1Cards = ["seifer", "squall", "rinoa", "quistis", "zell"];
-  player2Cards = ["selphie", "irvine", "kiros", "ward", "laguna"];
-  shuffleCards(player1Cards);
-  shuffleCards(player2Cards);
-
-  renderHands();
-}
-
-// Mischia le carte
-function shuffleCards(cards) {
-  for (let i = cards.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [cards[i], cards[j]] = [cards[j], cards[i]];
-  }
-}
-
-// Rendi visibili le mani dei giocatori
-function renderHands() {
-  const player1Hand = document.getElementById("player1Hand");
-  const player2Hand = document.getElementById("player2Hand");
-  player1Hand.innerHTML = '';
-  player2Hand.innerHTML = '';
-
-  player1Cards.forEach(cardName => {
-    const card = createCardElement(cardName, 1);
-    player1Hand.appendChild(card);
-  });
-
-  player2Cards.forEach(cardName => {
-    const card = createCardElement(cardName, 2);
-    player2Hand.appendChild(card);
-  });
-}
-
-// Crea una carta HTML
+// Funzione per creare una carta (con i valori della carta)
 function createCardElement(cardName, player) {
   const card = document.createElement("div");
-  card.classList.add("card", `player${player}`);
-  card.setAttribute("data-card", cardName);
+  card.classList.add("card");
+  card.dataset.card = JSON.stringify({ name: cardName, player });
+  card.style.backgroundImage = `url('img/${cardName}.png')`;
+  card.setAttribute("draggable", true);
 
-  const img = document.createElement("img");
-  img.src = `images/${cardName}.png`;
-  card.appendChild(img);
-
-  card.draggable = true;
   card.addEventListener("dragstart", dragStart);
   card.addEventListener("dragend", dragEnd);
 
   return card;
 }
 
-// Imposta l'ascolto degli eventi di drag
-function setupEventListeners() {
-  const cells = document.querySelectorAll("#gameBoard .cell");
-  cells.forEach(cell => {
-    cell.addEventListener("dragover", dragOver);
-    cell.addEventListener("drop", dropCard);
-  });
+// Funzione per gestire l'evento dragstart
+function dragStart(e) {
+  e.dataTransfer.setData("text", e.target.dataset.card);
 }
 
-// Gestisce il drag delle carte
-function dragStart(event) {
-  event.dataTransfer.setData("card", event.target.dataset.card);
+// Funzione per gestire l'evento dragend
+function dragEnd(e) {
+  e.target.classList.remove("dragging");
 }
 
-function dragEnd(event) {
-  event.target.classList.remove("flip");
+// Funzione per verificare la posizione valida sulla board
+function isValidPosition(x, y) {
+  return x >= 0 && x < 3 && y >= 0 && y < 3;
 }
 
-// Gestisce il drop della carta
-function dragOver(event) {
-  event.preventDefault();
-}
-
-function dropCard(event) {
-  event.preventDefault();
-
-  const cardName = event.dataTransfer.getData("card");
-  const cell = event.target;
-
-  if (!cell.classList.contains("cell") || cell.classList.contains("occupied")) return;
-
-  cell.classList.add("occupied");
-  placeCard(cardName, cell);
-}
-
-// Posiziona la carta sulla cella
+// Funzione per aggiungere una carta nella posizione
 function placeCard(cardName, cell) {
+  const x = Math.floor(cell / 3);
+  const y = cell % 3;
   const card = createCardElement(cardName, currentPlayer);
-  card.classList.add("flip");
-  cell.appendChild(card);
 
-  // Aggiorna il punteggio
+  // Verifica Same e Plus
+  checkSame(card, x, y);
+  checkPlus(card, x, y);
+  checkCombo(card, x, y); // Aggiungi il controllo Combo
+
+  board[x][y] = card;
+  placedCards++;
+
+  // Aggiornamento punteggio
   updateScore();
   checkWinner();
 
-  placedCards++;
-  if (placedCards >= 9) {
-    alert("Partita finita!");
-  }
-
-  // Cambia turno
+  // Cambia il turno
   currentPlayer = currentPlayer === 1 ? 2 : 1;
   updateActivePlayer();
 }
 
-// Cambia il giocatore attivo
-function updateActivePlayer() {
-  const player1Hand = document.getElementById("player1Hand");
-  const player2Hand = document.getElementById("player2Hand");
-  
-  if (currentPlayer === 1) {
-    player1Hand.classList.add("active");
-    player2Hand.classList.remove("active");
-  } else {
-    player2Hand.classList.add("active");
-    player1Hand.classList.remove("active");
-  }
+// Funzione per verificare Same
+function checkSame(card, x, y) {
+  const directions = [
+    { dx: 0, dy: -1 }, // sopra
+    { dx: 1, dy: 0 },  // destra
+    { dx: 0, dy: 1 },  // sotto
+    { dx: -1, dy: 0 }   // sinistra
+  ];
+
+  directions.forEach(direction => {
+    const nx = x + direction.dx;
+    const ny = y + direction.dy;
+    if (isValidPosition(nx, ny) && board[nx][ny] !== null) {
+      const neighborCard = board[nx][ny];
+      if (card[direction.dy === 0 ? (direction.dx === 1 ? 'right' : 'left') : (direction.dy === 1 ? 'bottom' : 'top')] === neighborCard[direction.dy === 0 ? (direction.dx === 1 ? 'left' : 'right') : (direction.dy === 1 ? 'top' : 'bottom')]) {
+        board[nx][ny] = card;
+        updateBoard();
+      }
+    }
+  });
 }
 
-// Aggiorna il punteggio (metodo semplificato per il momento)
+// Funzione per verificare Plus
+function checkPlus(card, x, y) {
+  const directions = [
+    { dx: 0, dy: -1 }, // sopra
+    { dx: 1, dy: 0 },  // destra
+    { dx: 0, dy: 1 },  // sotto
+    { dx: -1, dy: 0 }   // sinistra
+  ];
+
+  directions.forEach(direction => {
+    const nx = x + direction.dx;
+    const ny = y + direction.dy;
+    if (isValidPosition(nx, ny) && board[nx][ny] !== null) {
+      const neighborCard = board[nx][ny];
+      const cardValue = card[direction.dy === 0 ? (direction.dx === 1 ? 'right' : 'left') : (direction.dy === 1 ? 'bottom' : 'top')];
+      const neighborValue = neighborCard[direction.dy === 0 ? (direction.dx === 1 ? 'left' : 'right') : (direction.dy === 1 ? 'top' : 'bottom')];
+
+      if (cardValue + neighborValue === 10) {
+        board[nx][ny] = card;
+        updateBoard();
+      }
+    }
+  });
+}
+
+// Funzione per verificare Combo
+function checkCombo(card, x, y) {
+  const directions = [
+    { dx: 0, dy: -1 }, // sopra
+    { dx: 1, dy: 0 },  // destra
+    { dx: 0, dy: 1 },  // sotto
+    { dx: -1, dy: 0 }   // sinistra
+  ];
+
+  directions.forEach(direction => {
+    const nx = x + direction.dx;
+    const ny = y + direction.dy;
+    if (isValidPosition(nx, ny) && board[nx][ny] !== null) {
+      const neighborCard = board[nx][ny];
+
+      // Verifica se la carta adiacente può essere acquisita tramite Same
+      if (card[direction.dy === 0 ? (direction.dx === 1 ? 'right' : 'left') : (direction.dy === 1 ? 'bottom' : 'top')] === neighborCard[direction.dy === 0 ? (direction.dx === 1 ? 'left' : 'right') : (direction.dy === 1 ? 'top' : 'bottom')]) {
+        board[nx][ny] = card;
+        updateBoard();
+        checkCombo(card, nx, ny); // Riprova a controllare se ci sono combo aggiuntive
+      }
+
+      // Verifica se la carta adiacente può essere acquisita tramite Plus
+      const cardValue = card[direction.dy === 0 ? (direction.dx === 1 ? 'right' : 'left') : (direction.dy === 1 ? 'bottom' : 'top')];
+      const neighborValue = neighborCard[direction.dy === 0 ? (direction.dx === 1 ? 'left' : 'right') : (direction.dy === 1 ? 'top' : 'bottom')];
+      if (cardValue + neighborValue === 10) {
+        board[nx][ny] = card;
+        updateBoard();
+        checkCombo(card, nx, ny); // Riprova a controllare se ci sono combo aggiuntive
+      }
+    }
+  });
+}
+
+// Funzione per aggiornare il punteggio
 function updateScore() {
-  const player1Score = document.getElementById("player1Score");
-  const player2Score = document.getElementById("player2Score");
+  let player1Score = 0;
+  let player2Score = 0;
 
-  // Punteggio fittizio basato sul numero di carte piazzate
-  player1Score.innerText = `Player 1 Score: ${Math.floor(Math.random() * 5)}`;
-  player2Score.innerText = `Player 2 Score: ${Math.floor(Math.random() * 5)}`;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] !== null) {
+        if (board[i][j].player === 1) player1Score++;
+        else player2Score++;
+      }
+    }
+  }
+
+  document.getElementById("player1Score").textContent = `Player 1: ${player1Score}`;
+  document.getElementById("player2Score").textContent = `Player 2: ${player2Score}`;
 }
 
-// Verifica se c'è un vincitore
+// Funzione per determinare se c'è un vincitore
 function checkWinner() {
   if (placedCards === 9) {
-    alert("La partita è finita!");
-    // Qui dovresti aggiungere la logica per determinare il vincitore
+    let player1Score = 0;
+    let player2Score = 0;
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] !== null) {
+          if (board[i][j].player === 1) player1Score++;
+          else player2Score++;
+        }
+      }
+    }
+
+    if (player1Score > player2Score) {
+      alert("Player 1 wins!");
+    } else if (player2Score > player1Score) {
+      alert("Player 2 wins!");
+    } else {
+      alert("It's a tie!");
+    }
   }
 }
 
-// Inizializza il gioco
-initializeGame();
+// Funzione per aggiornare l'indicatore del giocatore attivo
+function updateActivePlayer() {
+  const playerIndicator = document.getElementById("playerIndicator");
+  playerIndicator.textContent = `Player ${currentPlayer}'s turn`;
+}
