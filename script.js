@@ -168,6 +168,7 @@ function getAdjacentCells(cell) {
 }
 
 function updateScore() {
+  console.log("Punteggio aggiornato:", scores);
   score1.textContent = `Giocatore 1: ${scores[1]}`;
   score2.textContent = `Giocatore 2: ${scores[2]}`;
 }
