@@ -109,28 +109,43 @@ function drop(event) {
 
 function compareCards(cell, card) {
   const adjacentCells = getAdjacentCells(cell);
-  console.log('Carta posizionata:', card.name, 'posizione:', cell.dataset.index);
+  let player1Won = false;
+  let player2Won = false;
 
   adjacentCells.forEach(adjCell => {
     if (adjCell.hasChildNodes()) {
       const adjCardElement = adjCell.querySelector('.card');
       const adjCardData = JSON.parse(adjCardElement.getAttribute('data-card'));
-      console.log('Carta adiacente:', adjCardData.name, 'potenza:', adjCardData.power);
 
-      // Confrontiamo le carte
+      console.log('Confronto tra:', card.name, adjCardData.name);
+
+      // Confronto tra le due carte
       if (card.power > adjCardData.power) {
-        console.log(`La carta ${card.name} vince su ${adjCardData.name}`);
         if (currentPlayer === 1) {
           scores[1]++;
           scores[2]--;
+          player1Won = true;
         } else {
           scores[2]++;
           scores[1]--;
+          player2Won = true;
         }
-        adjCardElement.classList.add('win');
+
+        adjCardElement.classList.add('win'); // Aggiungi classe per evidenziare la carta vinta
       }
     }
   });
+
+  // Aggiorna il punteggio
+  updateScore();
+  updateStatus();
+
+  // Cambia il colore della carta vincente
+  if (player1Won) {
+    cell.classList.add('player1-wins');
+  } else if (player2Won) {
+    cell.classList.add('player2-wins');
+  }
 }
 
 function getAdjacentCells(cell) {
@@ -153,10 +168,8 @@ function getAdjacentCells(cell) {
 }
 
 function updateScore() {
-  const player1Cards = document.querySelectorAll('.player1').length;
-  const player2Cards = document.querySelectorAll('.player2').length;
-  scores[1] = player1Cards;
-  scores[2] = player2Cards;
+  score1.textContent = `Giocatore 1: ${scores[1]}`;
+  score2.textContent = `Giocatore 2: ${scores[2]}`;
 }
 
 function updateStatus() {
