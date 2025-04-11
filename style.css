@@ -68,13 +68,14 @@ button:hover {
 .card {
   width: 120px;
   height: 120px;
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  background-color: transparent;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .card:hover {
@@ -108,6 +109,19 @@ button:hover {
   background-color: rgba(255, 0, 0, 0.2); /* sfondo rosso trasparente */
 }
 
+.value {
+  position: absolute;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+  text-shadow: 0 0 3px black;
+  z-index: 2;
+}
+
+.top { top: 4px; left: 50%; transform: translateX(-50%); }
+.right { top: 50%; right: 4px; transform: translateY(-50%); }
+.bottom { bottom: 4px; left: 50%; transform: translateX(-50%); }
+.left { top: 50%; left: 4px; transform: translateY(-50%); }
 
 .occupied {
   pointer-events: none;
