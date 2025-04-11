@@ -109,14 +109,17 @@ function drop(event) {
 
 function compareCards(cell, card) {
   const adjacentCells = getAdjacentCells(cell);
+  console.log('Carta posizionata:', card.name, 'posizione:', cell.dataset.index);
+
   adjacentCells.forEach(adjCell => {
     if (adjCell.hasChildNodes()) {
       const adjCardElement = adjCell.querySelector('.card');
       const adjCardData = JSON.parse(adjCardElement.getAttribute('data-card'));
+      console.log('Carta adiacente:', adjCardData.name, 'potenza:', adjCardData.power);
 
-      // Verifica se la carta posizionata vince
+      // Confrontiamo le carte
       if (card.power > adjCardData.power) {
-        // La carta corrente vince sulla carta adiacente
+        console.log(`La carta ${card.name} vince su ${adjCardData.name}`);
         if (currentPlayer === 1) {
           scores[1]++;
           scores[2]--;
