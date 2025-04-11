@@ -112,3 +112,16 @@ button:hover {
 .occupied {
   pointer-events: none;
 }
+
+.win {
+  border-color: gold;
+  box-shadow: 0 0 15px gold;
+}
+
+.player1-wins {
+  background-color: rgba(0, 0, 255, 0.3);
+}
+
+.player2-wins {
+  background-color: rgba(255, 0, 0, 0.3);
+}
