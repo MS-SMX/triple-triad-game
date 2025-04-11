@@ -1,107 +1,143 @@
-let player1Hand = [];
-let player2Hand = [];
-let board = [];
+const board = document.getElementById('board');
+const hand1 = document.getElementById('hand1');
+const hand2 = document.getElementById('hand2');
+const score1 = document.getElementById('score1');
+const score2 = document.getElementById('score2');
+const resetButton = document.getElementById('resetButton');
+
 let currentPlayer = 1;
-let player1Score = 0;
-let player2Score = 0;
+let scores = { 1: 5, 2: 5 }; // Ogni giocatore inizia con 5 carte
+let moves = 0;
+let gameOver = false;
 
-const player1HandDiv = document.getElementById('player1-hand');
-const player2HandDiv = document.getElementById('player2-hand');
-const gameBoardDiv = document.getElementById('game-board');
-const turnDisplay = document.getElementById('turn-display');
-const scorePlayer1 = document.getElementById('score-player1');
-const scorePlayer2 = document.getElementById('score-player2');
-const resetButton = document.getElementById('reset-button');
-
-// Predefinire le carte
 const cards = [
-    { id: 1, name: "Squall", values: [5, 4, 3, 2] },
-    { id: 2, name: "Seifer", values: [3, 5, 1, 4] },
-    { id: 3, name: "Rinoa", values: [4, 4, 4, 4] },
-    { id: 4, name: "Quistis", values: [2, 3, 5, 3] },
-    { id: 5, name: "Zell", values: [1, 2, 3, 5] },
-    { id: 6, name: "Irvine", values: [3, 3, 2, 4] },
-    { id: 7, name: "Selphie", values: [4, 1, 2, 4] },
-    { id: 8, name: "Laguna", values: [5, 2, 3, 2] },
-    { id: 9, name: "Kiros", values: [4, 2, 3, 3] }
+  { name: 'Ifrit', image: 'ifrit.png', power: 5 },
+  { name: 'Shiva', image: 'shiva.png', power: 4 },
+  { name: 'Quistis', image: 'quistis.png', power: 6 },
+  { name: 'Zell', image: 'zell.png', power: 3 },
+  { name: 'Selphie', image: 'selphie.png', power: 2 },
+  { name: 'Seifer', image: 'seifer.png', power: 7 },
+  { name: 'Squall', image: 'squall.png', power: 8 },
+  { name: 'Rinoa', image: 'rinoa.png', power: 6 },
+  { name: 'Edea', image: 'edea.png', power: 5 },
+  { name: 'Irvine', image: 'irvine.png', power: 3 },
 ];
 
-// Inizializzare la partita
-function startGame() {
-    player1Hand = [...cards].slice(0, 5);
-    player2Hand = [...cards].slice(5, 10);
-    board = Array(9).fill(null);
-    updateBoard();
-    updateHands();
-    updateTurnDisplay();
-    player1Score = 0;
-    player2Score = 0;
-    updateScores();
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
 }
 
-function updateHands() {
-    player1HandDiv.innerHTML = '';
-    player2HandDiv.innerHTML = '';
-    
-    player1Hand.forEach(card => {
-        const cardDiv = createCardElement(card, 1);
-        player1HandDiv.appendChild(cardDiv);
-    });
-
-    player2Hand.forEach(card => {
-        const cardDiv = createCardElement(card, 2);
-        player2HandDiv.appendChild(cardDiv);
-    });
+function initBoard() {
+  board.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.index = i;
+    cell.addEventListener('dragover', e => e.preventDefault());
+    cell.addEventListener('drop', drop);
+    board.appendChild(cell);
+  }
 }
 
-function createCardElement(card, player) {
-    const cardDiv = document.createElement('div');
-    cardDiv.classList.add('card');
-    cardDiv.setAttribute('draggable', true);
-    cardDiv.setAttribute('data-id', card.id);
-    cardDiv.setAttribute('data-player', player);
-    cardDiv.setAttribute('data-values', JSON.stringify(card.values));
-    cardDiv.innerHTML = `${card.name}`;
-    
-    cardDiv.style.backgroundImage = `url('images/${card.name.toLowerCase()}.png')`;
-    
-    cardDiv.addEventListener('dragstart', dragStart);
-    cardDiv.addEventListener('dragend', dragEnd);
-    return cardDiv;
+function createCard(card, player) {
+  const cardElement = document.createElement('div');
+  cardElement.className = 'card';
+  cardElement.setAttribute('draggable', true);
+  cardElement.setAttribute('data-card', JSON.stringify(card));
+  cardElement.setAttribute('data-player', player);
+
+  const img = document.createElement('img');
+  img.src = `img/${card.image}`;
+  img.alt = card.name;
+  cardElement.appendChild(img);
+
+  cardElement.addEventListener('dragstart', dragStart);
+
+  if (player === 1) cardElement.classList.add('player1');
+  else if (player === 2) cardElement.classList.add('player2');
+
+  return cardElement;
 }
 
-function updateBoard() {
-    gameBoardDiv.innerHTML = '';
-    board.forEach((card, index) => {
-        const cellDiv = document.createElement('div');
-        cellDiv.classList.add('cell');
-        cellDiv.setAttribute('data-index', index);
-        if (card) {
-            const cardDiv = createCardElement(card, card.player);
-            cellDiv.appendChild(cardDiv);
-        }
-        gameBoardDiv.appendChild(cellDiv);
-    });
+function dragStart(event) {
+  const cardElement = event.target.closest('.card');
+  if (!cardElement) return;
+  if (parseInt(cardElement.getAttribute('data-player')) !== currentPlayer) return event.preventDefault();
+
+  const cardData = cardElement.getAttribute('data-card');
+  event.dataTransfer.setData('application/json', cardData);
+  event.dataTransfer.setData('text/plain', cardElement.outerHTML);
 }
 
-function updateTurnDisplay() {
-    turnDisplay.textContent = `It's Player ${currentPlayer}'s turn`;
+function drop(event) {
+  event.preventDefault();
+  if (gameOver) return;
+
+  const cell = event.target.closest('.cell');
+  if (!cell || cell.hasChildNodes()) return;
+
+  const cardData = event.dataTransfer.getData('application/json');
+  const card = JSON.parse(cardData);
+
+  const cardElement = createCard(card, currentPlayer);
+  cardElement.setAttribute('draggable', false);
+  cell.appendChild(cardElement);
+  cell.classList.add('occupied');
+
+  const hand = currentPlayer === 1 ? hand1 : hand2;
+  const cards = [...hand.children];
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].getAttribute('data-card') === JSON.stringify(card)) {
+      cards[i].remove();
+      break;
+    }
+  }
+
+  updateScore();
+  moves++;
+  if (moves >= 9) {
+    endGame();
+  } else {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+  }
+  updateStatus();
 }
 
-function updateScores() {
-    scorePlayer1.textContent = player1Score;
-    scorePlayer2.textContent = player2Score;
+function updateScore() {
+  const player1Cards = document.querySelectorAll('.player1').length;
+  const player2Cards = document.querySelectorAll('.player2').length;
+  scores[1] = player1Cards;
+  scores[2] = player2Cards;
 }
 
-function dragStart(e) {
-    e.dataTransfer.setData('card-id', e.target.getAttribute('data-id'));
+function updateStatus() {
+  score1.textContent = `Giocatore 1: ${scores[1]}`;
+  score2.textContent = `Giocatore 2: ${scores[2]}`;
 }
 
-function dragEnd() {
-    const cardId = event.target.getAttribute('data-id');
-    // Logic for dropping the card on the board
+function endGame() {
+  gameOver = true;
+  let message = 'Pareggio!';
+  if (scores[1] > scores[2]) message = 'Giocatore 1 vince!';
+  if (scores[2] > scores[1]) message = 'Giocatore 2 vince!';
+  alert(message);
 }
 
-resetButton.addEventListener('click', startGame);
+function resetGame() {
+  currentPlayer = 1;
+  scores = { 1: 5, 2: 5 };
+  moves = 0;
+  gameOver = false;
+  updateStatus();
+  hand1.innerHTML = '';
+  hand2.innerHTML = '';
+  initBoard();
+  const shuffled = shuffle([...cards]);
+  const cards1 = shuffled.slice(0, 5);
+  const cards2 = shuffled.slice(5, 10);
+  cards1.forEach(card => hand1.appendChild(createCard(card, 1)));
+  cards2.forEach(card => hand2.appendChild(createCard(card, 2)));
+}
 
-startGame();
+resetButton.addEventListener('click', resetGame);
+resetGame();
