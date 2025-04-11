@@ -84,6 +84,9 @@ function drop(event) {
   cell.appendChild(cardElement);
   cell.classList.add('occupied');
 
+  // Confronta le carte adiacenti
+  compareCards(cell, card);
+
   const hand = currentPlayer === 1 ? hand1 : hand2;
   const cards = [...hand.children];
   for (let i = 0; i < cards.length; i++) {
@@ -101,6 +104,49 @@ function drop(event) {
     currentPlayer = currentPlayer === 1 ? 2 : 1;
   }
   updateStatus();
+}
+
+
+function compareCards(cell, card) {
+  const adjacentCells = getAdjacentCells(cell);
+  adjacentCells.forEach(adjCell => {
+    if (adjCell.hasChildNodes()) {
+      const adjCardElement = adjCell.querySelector('.card');
+      const adjCardData = JSON.parse(adjCardElement.getAttribute('data-card'));
+
+      // Verifica se la carta posizionata vince
+      if (card.power > adjCardData.power) {
+        // La carta corrente vince sulla carta adiacente
+        if (currentPlayer === 1) {
+          scores[1]++;
+          scores[2]--;
+        } else {
+          scores[2]++;
+          scores[1]--;
+        }
+        adjCardElement.classList.add('win');
+      }
+    }
+  });
+}
+
+function getAdjacentCells(cell) {
+  const index = parseInt(cell.dataset.index);
+  const adjCells = [];
+
+  const row = Math.floor(index / 3);
+  const col = index % 3;
+
+  // Top
+  if (row > 0) adjCells.push(board.children[index - 3]);
+  // Bottom
+  if (row < 2) adjCells.push(board.children[index + 3]);
+  // Left
+  if (col > 0) adjCells.push(board.children[index - 1]);
+  // Right
+  if (col < 2) adjCells.push(board.children[index + 1]);
+
+  return adjCells;
 }
 
 function updateScore() {
