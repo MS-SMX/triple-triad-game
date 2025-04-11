@@ -1,32 +1,31 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triple Triad - Final Fantasy VIII</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triple Triad</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Triple Triad</h1>
-  <div id="scoreboard">
-    <span id="score1">Giocatore 1: 0</span>
-    <span id="score2">Giocatore 2: 0</span>
-    <button id="resetButton">Reset</button>
-  </div>
-
-  <div class="hand-container">
-    <h2>Mano Giocatore 1</h2>
-    <div id="hand1" class="hand"></div>
-  </div>
-
-  <div id="board" class="board"></div>
-
-  <div class="hand-container">
-    <h2>Mano Giocatore 2</h2>
-    <div id="hand2" class="hand"></div>
-  </div>
-
-  <script src="script.js"></script>
+    <div id="game-container">
+        <div id="player1-hand" class="hand">
+            <h2>Player 1 Hand</h2>
+        </div>
+        <div id="game-board" class="board">
+            <h2>Game Board</h2>
+        </div>
+        <div id="player2-hand" class="hand">
+            <h2>Player 2 Hand</h2>
+        </div>
+        <div id="scoreboard">
+            <p>Player 1 Score: <span id="score-player1">0</span></p>
+            <p>Player 2 Score: <span id="score-player2">0</span></p>
+        </div>
+        <div id="turn-display">
+            <p>It's Player 1's turn</p>
+        </div>
+        <button id="reset-button">Reset Game</button>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
-
