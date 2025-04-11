@@ -1,190 +1,143 @@
-// script.js con tutte le regole base + avanzate di Triple Triad
+const board = document.getElementById('board');
+const hand1 = document.getElementById('hand1');
+const hand2 = document.getElementById('hand2');
+const score1 = document.getElementById('score1');
+const score2 = document.getElementById('score2');
+const resetButton = document.getElementById('resetButton');
 
-const board = document.getElementById("board");
-const player1Hand = document.getElementById("player1-hand");
-const player2Hand = document.getElementById("player2-hand");
-const statusText = document.getElementById("game-status");
-const player1Score = document.getElementById("player1-score");
-const player2Score = document.getElementById("player2-score");
-
-let turn = 1;
-let boardState = Array(9).fill(null);
-let cardsInPlay = 0;
+let currentPlayer = 1;
+let scores = { 1: 5, 2: 5 }; // Ogni giocatore inizia con 5 carte
+let moves = 0;
+let gameOver = false;
 
 const cards = [
-  { name: "Seifer", img: "img/seifer.png", values: { top: 5, right: 3, bottom: 6, left: 2 } },
-  { name: "Squall", img: "img/squall.png", values: { top: 6, right: 5, bottom: 3, left: 6 } },
-  { name: "Zell", img: "img/zell.png", values: { top: 4, right: 4, bottom: 5, left: 5 } },
-  { name: "Irvine", img: "img/irvine.png", values: { top: 3, right: 6, bottom: 2, left: 4 } },
-  { name: "Quistis", img: "img/quistis.png", values: { top: 5, right: 4, bottom: 6, left: 3 } },
-  { name: "Selphie", img: "img/selphie.png", values: { top: 3, right: 2, bottom: 4, left: 6 } },
-  { name: "Rinoa", img: "img/rinoa.png", values: { top: 4, right: 5, bottom: 3, left: 4 } },
-  { name: "Laguna", img: "img/laguna.png", values: { top: 6, right: 3, bottom: 2, left: 6 } },
-  { name: "Edea", img: "img/edea.png", values: { top: 5, right: 6, bottom: 4, left: 2 } },
-  { name: "Fujin", img: "img/fujin.png", values: { top: 4, right: 5, bottom: 6, left: 1 } }
+  { name: 'Ifrit', image: 'ifrit.png', power: 5 },
+  { name: 'Shiva', image: 'shiva.png', power: 4 },
+  { name: 'Quistis', image: 'quistis.png', power: 6 },
+  { name: 'Zell', image: 'zell.png', power: 3 },
+  { name: 'Selphie', image: 'selphie.png', power: 2 },
+  { name: 'Seifer', image: 'seifer.png', power: 7 },
+  { name: 'Squall', image: 'squall.png', power: 8 },
+  { name: 'Rinoa', image: 'rinoa.png', power: 6 },
+  { name: 'Edea', image: 'edea.png', power: 5 },
+  { name: 'Irvine', image: 'irvine.png', power: 3 },
 ];
 
-function shuffleAndDeal() {
-  const shuffled = [...cards].sort(() => Math.random() - 0.5);
-  const p1 = shuffled.slice(0, 5);
-  const p2 = shuffled.slice(5, 10);
-  p1.forEach(card => createCard(card, player1Hand, 1));
-  p2.forEach(card => createCard(card, player2Hand, 2));
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
 }
 
-function createCard(card, container, owner) {
-  const div = document.createElement("div");
-  div.className = "card";
-  div.draggable = true;
-  div.innerHTML = `<img src="${card.img}" draggable="false"><div class="values">
-    <span class="top">${card.values.top}</span>
-    <span class="right">${card.values.right}</span>
-    <span class="bottom">${card.values.bottom}</span>
-    <span class="left">${card.values.left}</span></div>`;
-  div.dataset.card = JSON.stringify(card);
-  div.dataset.owner = owner;
-
-  div.addEventListener("dragstart", dragStart);
-  container.appendChild(div);
+function initBoard() {
+  board.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.index = i;
+    cell.addEventListener('dragover', e => e.preventDefault());
+    cell.addEventListener('drop', drop);
+    board.appendChild(cell);
+  }
 }
 
-function dragStart(e) {
-  e.dataTransfer.setData("text/plain", e.target.dataset.card);
-  e.dataTransfer.setData("text/owner", e.target.dataset.owner);
-  setTimeout(() => e.target.classList.add("hide"), 0);
+function createCard(card, player) {
+  const cardElement = document.createElement('div');
+  cardElement.className = 'card';
+  cardElement.setAttribute('draggable', true);
+  cardElement.setAttribute('data-card', JSON.stringify(card));
+  cardElement.setAttribute('data-player', player);
+
+  const img = document.createElement('img');
+  img.src = `img/${card.image}`;
+  img.alt = card.name;
+  cardElement.appendChild(img);
+
+  cardElement.addEventListener('dragstart', dragStart);
+
+  if (player === 1) cardElement.classList.add('player1');
+  else if (player === 2) cardElement.classList.add('player2');
+
+  return cardElement;
 }
 
-function dragOver(e) {
-  e.preventDefault();
+function dragStart(event) {
+  const cardElement = event.target.closest('.card');
+  if (!cardElement) return;
+  if (parseInt(cardElement.getAttribute('data-player')) !== currentPlayer) return event.preventDefault();
+
+  const cardData = cardElement.getAttribute('data-card');
+  event.dataTransfer.setData('application/json', cardData);
+  event.dataTransfer.setData('text/plain', cardElement.outerHTML);
 }
 
-function drop(e) {
-  e.preventDefault();
-  const data = e.dataTransfer.getData("text/plain");
-  const owner = parseInt(e.dataTransfer.getData("text/owner"));
+function drop(event) {
+  event.preventDefault();
+  if (gameOver) return;
 
-  if ((turn % 2 === 1 && owner !== 1) || (turn % 2 === 0 && owner !== 2)) return;
+  const cell = event.target.closest('.cell');
+  if (!cell || cell.hasChildNodes()) return;
 
-  const card = JSON.parse(data);
-  const cell = e.target.closest(".cell");
-  const pos = parseInt(cell.dataset.position);
+  const cardData = event.dataTransfer.getData('application/json');
+  const card = JSON.parse(cardData);
 
-  if (!cell || boardState[pos]) return;
+  const cardElement = createCard(card, currentPlayer);
+  cardElement.setAttribute('draggable', false);
+  cell.appendChild(cardElement);
+  cell.classList.add('occupied');
 
-  const img = document.createElement("img");
-  img.src = card.img;
-  img.className = `player${owner}`;
-  cell.appendChild(img);
-  boardState[pos] = { ...card, owner };
-  cardsInPlay++;
-
-  const sourceHand = owner === 1 ? player1Hand : player2Hand;
-  [...sourceHand.children].find(el => el.dataset.card === data)?.remove();
-
-  checkFlips(pos, card, owner);
-  updateScores();
-
-  if (cardsInPlay === 9) return endGame();
-
-  turn++;
-  statusText.textContent = `Turno del Giocatore ${turn % 2 === 1 ? 1 : 2}`;
-}
-
-function checkFlips(pos, card, owner, chain = true) {
-  const adjacent = [
-    { pos: pos - 3, dir: "top", opp: "bottom" },
-    { pos: pos + 3, dir: "bottom", opp: "top" },
-    { pos: pos - 1, dir: "left", opp: "right" },
-    { pos: pos + 1, dir: "right", opp: "left" },
-  ];
-
-  let flipped = [];
-  adjacent.forEach(({ pos: adjPos, dir, opp }) => {
-    if (adjPos < 0 || adjPos > 8 || !boardState[adjPos]) return;
-    const adjCard = boardState[adjPos];
-    if (adjCard.owner !== owner && card.values[dir] > adjCard.values[opp]) {
-      boardState[adjPos].owner = owner;
-      flipped.push(adjPos);
-      const cell = board.querySelector(`.cell[data-position='${adjPos}']`);
-      cell.firstChild.className = `player${owner}`;
+  const hand = currentPlayer === 1 ? hand1 : hand2;
+  const cards = [...hand.children];
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].getAttribute('data-card') === JSON.stringify(card)) {
+      cards[i].remove();
+      break;
     }
-  });
-
-  if (chain) {
-    flipped.forEach(f => checkFlips(f, boardState[f], owner, false));
   }
 
-  checkSamePlus(pos, card, owner);
-}
-
-function checkSamePlus(pos, card, owner) {
-  const dirs = [
-    { dx: -1, dy: 0, dir: "left", opp: "right" },
-    { dx: 1, dy: 0, dir: "right", opp: "left" },
-    { dx: 0, dy: -1, dir: "top", opp: "bottom" },
-    { dx: 0, dy: 1, dir: "bottom", opp: "top" }
-  ];
-
-  const row = Math.floor(pos / 3);
-  const col = pos % 3;
-  let same = [], plus = [], total = {};
-
-  dirs.forEach(({ dx, dy, dir, opp }) => {
-    const r = row + dy, c = col + dx;
-    if (r < 0 || r > 2 || c < 0 || c > 2) return;
-    const adjPos = r * 3 + c;
-    const adj = boardState[adjPos];
-    if (!adj || adj.owner === owner) return;
-    const val1 = card.values[dir];
-    const val2 = adj.values[opp];
-    total[adjPos] = val1 + val2;
-    if (val1 === val2) same.push(adjPos);
-  });
-
-  if (same.length >= 2) {
-    same.forEach(p => {
-      boardState[p].owner = owner;
-      const cell = board.querySelector(`.cell[data-position='${p}']`);
-      cell.firstChild.className = `player${owner}`;
-    });
+  updateScore();
+  moves++;
+  if (moves >= 9) {
+    endGame();
+  } else {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
   }
-
-  const match = Object.entries(total).reduce((acc, [pos1, sum1]) => {
-    for (let [pos2, sum2] of Object.entries(total)) {
-      if (pos1 !== pos2 && sum1 === sum2) acc.push(parseInt(pos1), parseInt(pos2));
-    }
-    return acc;
-  }, []);
-
-  [...new Set(match)].forEach(p => {
-    boardState[p].owner = owner;
-    const cell = board.querySelector(`.cell[data-position='${p}']`);
-    cell.firstChild.className = `player${owner}`;
-  });
+  updateStatus();
 }
 
-function updateScores() {
-  const score = boardState.reduce((acc, card) => {
-    if (!card) return acc;
-    if (card.owner === 1) acc[0]++;
-    else acc[1]++;
-    return acc;
-  }, [0, 0]);
-  player1Score.textContent = `Giocatore 1: ${score[0]}`;
-  player2Score.textContent = `Giocatore 2: ${score[1]}`;
+function updateScore() {
+  const player1Cards = document.querySelectorAll('.player1').length;
+  const player2Cards = document.querySelectorAll('.player2').length;
+  scores[1] = player1Cards;
+  scores[2] = player2Cards;
+}
+
+function updateStatus() {
+  score1.textContent = `Giocatore 1: ${scores[1]}`;
+  score2.textContent = `Giocatore 2: ${scores[2]}`;
 }
 
 function endGame() {
-  const p1 = boardState.filter(c => c?.owner === 1).length;
-  const p2 = boardState.filter(c => c?.owner === 2).length;
-  if (p1 > p2) statusText.textContent = "Vittoria del Giocatore 1!";
-  else if (p2 > p1) statusText.textContent = "Vittoria del Giocatore 2!";
-  else statusText.textContent = "Pareggio!";
+  gameOver = true;
+  let message = 'Pareggio!';
+  if (scores[1] > scores[2]) message = 'Giocatore 1 vince!';
+  if (scores[2] > scores[1]) message = 'Giocatore 2 vince!';
+  alert(message);
 }
 
-board.querySelectorAll(".cell").forEach(cell => {
-  cell.addEventListener("dragover", dragOver);
-  cell.addEventListener("drop", drop);
-});
+function resetGame() {
+  currentPlayer = 1;
+  scores = { 1: 5, 2: 5 };
+  moves = 0;
+  gameOver = false;
+  updateStatus();
+  hand1.innerHTML = '';
+  hand2.innerHTML = '';
+  initBoard();
+  const shuffled = shuffle([...cards]);
+  const cards1 = shuffled.slice(0, 5);
+  const cards2 = shuffled.slice(5, 10);
+  cards1.forEach(card => hand1.appendChild(createCard(card, 1)));
+  cards2.forEach(card => hand2.appendChild(createCard(card, 2)));
+}
 
-shuffleAndDeal();
+resetButton.addEventListener('click', resetGame);
+resetGame();
