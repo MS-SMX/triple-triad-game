@@ -116,12 +116,15 @@ button:hover {
 .win {
   border-color: gold;
   box-shadow: 0 0 15px gold;
+  transition: all 0.3s ease;
 }
 
 .player1-wins {
   background-color: rgba(0, 0, 255, 0.3);
+  transition: background-color 0.3s ease;
 }
 
 .player2-wins {
   background-color: rgba(255, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
 }
