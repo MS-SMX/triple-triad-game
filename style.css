@@ -1,86 +1,114 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    flex-direction: column;
+  font-family: 'Trebuchet MS', sans-serif;
+  background: #0c0c0c url('bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
 }
 
-#game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.hand {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-    width: 70%;
-}
-
-.card {
-    width: 50px;
-    height: 70px;
-    margin: 5px;
-    border: 2px solid #333;
-    background-color: #fff;
-    cursor: pointer;
-    text-align: center;
-    line-height: 70px;
-    font-size: 16px;
-    border-radius: 5px;
-}
-
-.board {
-    display: grid;
-    grid-template-columns: repeat(3, 80px);
-    grid-template-rows: repeat(3, 80px);
-    gap: 10px;
-    margin: 20px 0;
-    width: 260px;
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: gold;
+  text-shadow: 2px 2px 4px #000;
 }
 
 #scoreboard {
-    margin: 20px 0;
-    font-size: 18px;
-}
-
-#turn-display {
-    font-size: 20px;
-    margin: 10px 0;
+  margin-bottom: 20px;
+  font-size: 1.2em;
 }
 
 button {
-    padding: 10px 20px;
-    margin-top: 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #222;
+  color: gold;
+  border: 2px solid gold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #45a049;
+  background-color: gold;
+  color: #222;
 }
 
-.card[data-player="1"] {
-    background-color: #d3e5f5; /* Light blue for Player 1 */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 10px;
+  justify-content: center;
+  margin: 30px auto;
 }
 
-.card[data-player="2"] {
-    background-color: #f5d3d3; /* Light red for Player 2 */
+.cell {
+  width: 100px;
+  height: 100px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid gold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.card.selected {
-    background-color: yellow;
+.hand-container {
+  margin-top: 20px;
+}
+
+.hand {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px gold;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+  position: relative;
+}
+
+.player1 .card {
+  box-shadow: 0 0 10px blue;
+  border-color: blue;
+}
+
+.player2 .card {
+  box-shadow: 0 0 10px red;
+  border-color: red;
+}
+
+.player1 {
+  background-color: rgba(0, 0, 255, 0.2); /* sfondo blu trasparente */
+}
+
+.player2 {
+  background-color: rgba(255, 0, 0, 0.2); /* sfondo rosso trasparente */
+}
+
+
+.occupied {
+  pointer-events: none;
 }
