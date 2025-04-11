@@ -1,143 +1,160 @@
-const board = document.getElementById('board');
-const hand1 = document.getElementById('hand1');
-const hand2 = document.getElementById('hand2');
-const score1 = document.getElementById('score1');
-const score2 = document.getElementById('score2');
-const resetButton = document.getElementById('resetButton');
-
-let currentPlayer = 1;
-let scores = { 1: 5, 2: 5 }; // Ogni giocatore inizia con 5 carte
-let moves = 0;
-let gameOver = false;
-
-const cards = [
-  { name: 'Ifrit', image: 'ifrit.png', power: 5 },
-  { name: 'Shiva', image: 'shiva.png', power: 4 },
-  { name: 'Quistis', image: 'quistis.png', power: 6 },
-  { name: 'Zell', image: 'zell.png', power: 3 },
-  { name: 'Selphie', image: 'selphie.png', power: 2 },
-  { name: 'Seifer', image: 'seifer.png', power: 7 },
-  { name: 'Squall', image: 'squall.png', power: 8 },
-  { name: 'Rinoa', image: 'rinoa.png', power: 6 },
-  { name: 'Edea', image: 'edea.png', power: 5 },
-  { name: 'Irvine', image: 'irvine.png', power: 3 },
+let currentPlayer = 1;  // Iniziamo con il giocatore 1
+let player1Cards = [];
+let player2Cards = [];
+let placedCards = 0;
+let board = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null]
 ];
 
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);
+// Eseguiamo l'inizializzazione del gioco
+function initializeGame() {
+  setupHands();
+  updateActivePlayer();
+  setupEventListeners();
 }
 
-function initBoard() {
-  board.innerHTML = '';
-  for (let i = 0; i < 9; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.dataset.index = i;
-    cell.addEventListener('dragover', e => e.preventDefault());
-    cell.addEventListener('drop', drop);
-    board.appendChild(cell);
+// Crea le mani per entrambi i giocatori
+function setupHands() {
+  // Esempio di carte per i giocatori
+  player1Cards = ["seifer", "squall", "rinoa", "quistis", "zell"];
+  player2Cards = ["selphie", "irvine", "kiros", "ward", "laguna"];
+  shuffleCards(player1Cards);
+  shuffleCards(player2Cards);
+
+  renderHands();
+}
+
+// Mischia le carte
+function shuffleCards(cards) {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
   }
 }
 
-function createCard(card, player) {
-  const cardElement = document.createElement('div');
-  cardElement.className = 'card';
-  cardElement.setAttribute('draggable', true);
-  cardElement.setAttribute('data-card', JSON.stringify(card));
-  cardElement.setAttribute('data-player', player);
+// Rendi visibili le mani dei giocatori
+function renderHands() {
+  const player1Hand = document.getElementById("player1Hand");
+  const player2Hand = document.getElementById("player2Hand");
+  player1Hand.innerHTML = '';
+  player2Hand.innerHTML = '';
 
-  const img = document.createElement('img');
-  img.src = `img/${card.image}`;
-  img.alt = card.name;
-  cardElement.appendChild(img);
+  player1Cards.forEach(cardName => {
+    const card = createCardElement(cardName, 1);
+    player1Hand.appendChild(card);
+  });
 
-  cardElement.addEventListener('dragstart', dragStart);
-
-  if (player === 1) cardElement.classList.add('player1');
-  else if (player === 2) cardElement.classList.add('player2');
-
-  return cardElement;
+  player2Cards.forEach(cardName => {
+    const card = createCardElement(cardName, 2);
+    player2Hand.appendChild(card);
+  });
 }
 
+// Crea una carta HTML
+function createCardElement(cardName, player) {
+  const card = document.createElement("div");
+  card.classList.add("card", `player${player}`);
+  card.setAttribute("data-card", cardName);
+
+  const img = document.createElement("img");
+  img.src = `images/${cardName}.png`;
+  card.appendChild(img);
+
+  card.draggable = true;
+  card.addEventListener("dragstart", dragStart);
+  card.addEventListener("dragend", dragEnd);
+
+  return card;
+}
+
+// Imposta l'ascolto degli eventi di drag
+function setupEventListeners() {
+  const cells = document.querySelectorAll("#gameBoard .cell");
+  cells.forEach(cell => {
+    cell.addEventListener("dragover", dragOver);
+    cell.addEventListener("drop", dropCard);
+  });
+}
+
+// Gestisce il drag delle carte
 function dragStart(event) {
-  const cardElement = event.target.closest('.card');
-  if (!cardElement) return;
-  if (parseInt(cardElement.getAttribute('data-player')) !== currentPlayer) return event.preventDefault();
-
-  const cardData = cardElement.getAttribute('data-card');
-  event.dataTransfer.setData('application/json', cardData);
-  event.dataTransfer.setData('text/plain', cardElement.outerHTML);
+  event.dataTransfer.setData("card", event.target.dataset.card);
 }
 
-function drop(event) {
+function dragEnd(event) {
+  event.target.classList.remove("flip");
+}
+
+// Gestisce il drop della carta
+function dragOver(event) {
   event.preventDefault();
-  if (gameOver) return;
+}
 
-  const cell = event.target.closest('.cell');
-  if (!cell || cell.hasChildNodes()) return;
+function dropCard(event) {
+  event.preventDefault();
 
-  const cardData = event.dataTransfer.getData('application/json');
-  const card = JSON.parse(cardData);
+  const cardName = event.dataTransfer.getData("card");
+  const cell = event.target;
 
-  const cardElement = createCard(card, currentPlayer);
-  cardElement.setAttribute('draggable', false);
-  cell.appendChild(cardElement);
-  cell.classList.add('occupied');
+  if (!cell.classList.contains("cell") || cell.classList.contains("occupied")) return;
 
-  const hand = currentPlayer === 1 ? hand1 : hand2;
-  const cards = [...hand.children];
-  for (let i = 0; i < cards.length; i++) {
-    if (cards[i].getAttribute('data-card') === JSON.stringify(card)) {
-      cards[i].remove();
-      break;
-    }
-  }
+  cell.classList.add("occupied");
+  placeCard(cardName, cell);
+}
 
+// Posiziona la carta sulla cella
+function placeCard(cardName, cell) {
+  const card = createCardElement(cardName, currentPlayer);
+  card.classList.add("flip");
+  cell.appendChild(card);
+
+  // Aggiorna il punteggio
   updateScore();
-  moves++;
-  if (moves >= 9) {
-    endGame();
-  } else {
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
+  checkWinner();
+
+  placedCards++;
+  if (placedCards >= 9) {
+    alert("Partita finita!");
   }
-  updateStatus();
+
+  // Cambia turno
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
+  updateActivePlayer();
 }
 
+// Cambia il giocatore attivo
+function updateActivePlayer() {
+  const player1Hand = document.getElementById("player1Hand");
+  const player2Hand = document.getElementById("player2Hand");
+  
+  if (currentPlayer === 1) {
+    player1Hand.classList.add("active");
+    player2Hand.classList.remove("active");
+  } else {
+    player2Hand.classList.add("active");
+    player1Hand.classList.remove("active");
+  }
+}
+
+// Aggiorna il punteggio (metodo semplificato per il momento)
 function updateScore() {
-  const player1Cards = document.querySelectorAll('.player1').length;
-  const player2Cards = document.querySelectorAll('.player2').length;
-  scores[1] = player1Cards;
-  scores[2] = player2Cards;
+  const player1Score = document.getElementById("player1Score");
+  const player2Score = document.getElementById("player2Score");
+
+  // Punteggio fittizio basato sul numero di carte piazzate
+  player1Score.innerText = `Player 1 Score: ${Math.floor(Math.random() * 5)}`;
+  player2Score.innerText = `Player 2 Score: ${Math.floor(Math.random() * 5)}`;
 }
 
-function updateStatus() {
-  score1.textContent = `Giocatore 1: ${scores[1]}`;
-  score2.textContent = `Giocatore 2: ${scores[2]}`;
+// Verifica se c'è un vincitore
+function checkWinner() {
+  if (placedCards === 9) {
+    alert("La partita è finita!");
+    // Qui dovresti aggiungere la logica per determinare il vincitore
+  }
 }
 
-function endGame() {
-  gameOver = true;
-  let message = 'Pareggio!';
-  if (scores[1] > scores[2]) message = 'Giocatore 1 vince!';
-  if (scores[2] > scores[1]) message = 'Giocatore 2 vince!';
-  alert(message);
-}
-
-function resetGame() {
-  currentPlayer = 1;
-  scores = { 1: 5, 2: 5 };
-  moves = 0;
-  gameOver = false;
-  updateStatus();
-  hand1.innerHTML = '';
-  hand2.innerHTML = '';
-  initBoard();
-  const shuffled = shuffle([...cards]);
-  const cards1 = shuffled.slice(0, 5);
-  const cards2 = shuffled.slice(5, 10);
-  cards1.forEach(card => hand1.appendChild(createCard(card, 1)));
-  cards2.forEach(card => hand2.appendChild(createCard(card, 2)));
-}
-
-resetButton.addEventListener('click', resetGame);
-resetGame();
+// Inizializza il gioco
+initializeGame();
