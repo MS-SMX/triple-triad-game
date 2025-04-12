@@ -66,15 +66,22 @@ button:hover {
 }
 
 .card {
-  width: 120px;
-  height: 120px;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 1px 1px 3px #000;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.animate-capture {
+  animation: glowChange 0.6s ease-in-out;
+}
+
+@keyframes glowChange {
+  0% { box-shadow: 0 0 5px gold; transform: scale(1.1); }
+  50% { box-shadow: 0 0 15px white; transform: scale(1.2); }
+  100% { box-shadow: 0 0 5px gold; transform: scale(1.0); }
 }
 
 .card:hover {
@@ -88,6 +95,18 @@ button:hover {
   object-fit: contain;
   z-index: 1;
   position: relative;
+}
+
+.card .top    { top: 2px; left: 50%; transform: translateX(-50%); }
+.card .right  { right: 2px; top: 50%; transform: translateY(-50%); }
+.card .bottom { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.card .left   { left: 2px; top: 50%; transform: translateY(-50%); }
+
+.card .values {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 5px;
+  border-radius: 4px;
 }
 
 .player1 .card {
