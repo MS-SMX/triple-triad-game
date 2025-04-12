@@ -48,6 +48,23 @@ function createCard(card, player) {
   cardElement.setAttribute('data-card', JSON.stringify(card));
   cardElement.setAttribute('data-player', player);
 
+  if (player === 1) cardElement.classList.add('player1');
+  else if (player === 2) cardElement.classList.add('player2');
+
+  // Aggiungi struttura per mostrare i valori
+  cardElement.innerHTML = `
+    <div class="values top">${card.top}</div>
+    <div class="values right">${card.right}</div>
+    <div class="values bottom">${card.bottom}</div>
+    <div class="values left">${card.left}</div>
+    <img src="img/${card.image}" alt="${card.name}" />
+  `;
+
+  cardElement.addEventListener('dragstart', dragStart);
+
+  return cardElement;
+}
+
   const img = document.createElement('img');
   img.src = `img/${card.image}`;
   img.alt = card.name;
