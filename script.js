@@ -108,6 +108,13 @@ function drop(event) {
   }
 
   compareCards(cell, card);
+  adjCardElement.setAttribute('data-player', currentPlayer);
+adjCardElement.classList.remove('player1', 'player2');
+adjCardElement.classList.add(currentPlayer === 1 ? 'player1' : 'player2');
+
+// Aggiungi animazione
+adjCardElement.classList.add('animate-capture');
+setTimeout(() => adjCardElement.classList.remove('animate-capture'), 700);
 
   updateScore();
   moves++;
